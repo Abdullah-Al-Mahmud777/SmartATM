@@ -1,52 +1,84 @@
-# SmartATM – Digital Banking & ATM System
 
-SmartATM is a full-stack ATM and digital banking system built using
-Next.js, Express.js and MongoDB.
+# 🚀 SmartATM – Digital Banking & ATM System
 
-It simulates real ATM operations like:
-- Secure login with card & PIN
+SmartATM is a full-stack **digital banking and ATM simulation system**
+built using **Next.js, Express.js, and MongoDB**.
+
+It replicates real-world ATM operations with secure authentication,
+transaction management, and an admin control panel.
+
+---
+
+## 📌 Key Features
+
+- Secure login with **Card & PIN**
 - Withdraw and deposit money
 - Fund transfer between users
-- Transaction history
-- Admin dashboard
+- Real-time balance and transaction history
+- Admin dashboard for system control
 
-## Tech Stack
-Frontend: Next.js, Tailwind CSS  
-Backend: Express.js, Node.js  
-Database: MongoDB, Mongoose  
-Auth: JWT, bcrypt  
+---
 
-## Features
+## 🛠 Tech Stack
 
-### User Module
+**Frontend**
+- Next.js (App Router)
+- Tailwind CSS
+- React Query
+
+**Backend**
+- Node.js
+- Express.js
+- REST API
+
+**Database**
+- MongoDB
+- Mongoose ODM
+
+**Authentication & Security**
+- JWT (Access & Refresh Token)
+- bcrypt (Password & PIN hashing)
+
+---
+
+## 👤 User Module
+
+Users can perform all core banking operations:
+
 - User registration & login
-- Virtual ATM card
-- PIN verification
-- Withdraw money
-- Deposit money
-- Balance check
+- Virtual ATM card generation
+- Secure PIN verification
+- Withdraw money from account
+- Deposit money into account
+- Check account balance
 - Mini statement (last 10 transactions)
-- Fund transfer
-- Change PIN
-- Block card
+- Fund transfer to other users
+- Change ATM PIN
+- Block ATM card
 
-### Admin Module
+---
+
+## 🛡 Admin Module
+
+Admins can monitor and control the entire system:
+
 - Admin login
-- View all users
+- View all registered users
 - View all transactions
-- Freeze user account
+- Freeze user accounts
 - Reset user PIN
-- Block card
-- System overview dashboard
+- Block user cards
+- System overview dashboard (stats & reports)
 
-## Architecture
-Next.js → Express API → MongoDB
+---
 
-## How to run
-Backend:
-npm install  
-npm run dev  
+## 🏗 System Architecture
 
-Frontend:
-npm install  
-npm run dev  
+```text
+Next.js (Frontend)
+        |
+        v
+Express.js REST API
+        |
+        v
+MongoDB (Database)
