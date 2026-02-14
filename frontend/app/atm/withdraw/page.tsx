@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 export default function Withdraw() {
   const router = useRouter();
   const [amount, setAmount] = useState('');
-  const [balance] = useState(50000);
+  const [balance, setBalance] = useState(50000); // ব্যালেন্স আপডেট করার জন্য state ব্যবহার করা হয়েছে
   const [message, setMessage] = useState('');
 
   const quickAmounts = [500, 1000, 2000, 5000, 10000];
@@ -14,7 +14,7 @@ export default function Withdraw() {
   const handleWithdraw = (withdrawAmount: number) => {
     setMessage('');
 
-    if (withdrawAmount <= 0) {
+    if (!withdrawAmount || withdrawAmount <= 0) {
       setMessage('Please enter a valid amount');
       return;
     }
@@ -29,7 +29,10 @@ export default function Withdraw() {
       return;
     }
 
+    setBalance(prev => prev - withdrawAmount);
     setMessage(`Successfully withdrawn ৳${withdrawAmount}`);
+    setAmount(''); // সাকসেস হওয়ার পর ইনপুট খালি হবে
+    
     setTimeout(() => router.push('/atm/dashboard'), 2000);
   };
 
@@ -63,7 +66,8 @@ export default function Withdraw() {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="Enter amount"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+              /* এখানে text-black এবং bg-white যোগ করা হয়েছে যাতে লিখা কালো দেখায় */
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-black bg-white outline-none"
             />
           </div>
 
@@ -90,7 +94,7 @@ export default function Withdraw() {
 
           <button
             onClick={() => handleWithdraw(Number(amount))}
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md"
           >
             Withdraw
           </button>
