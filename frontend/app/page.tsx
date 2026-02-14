@@ -23,7 +23,7 @@ export default function Home() {
               onClick={() => router.push('/atm/login')}
               className="px-8 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-700 transition-colors"
             >
-              User Login
+              userLogin
             </button>
             <button 
               onClick={() => router.push('/admin/login')}
@@ -38,9 +38,9 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-white py-6 mt-auto border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 text-center text-gray-700">
-          <p>&copy; {new Date().getFullYear()} SmartATM. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} SmartATM Developed by Abdullah-Al-Mahmud</p>
         </div>
       </footer>
     </div>
-  );
+  )
 }

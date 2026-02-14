@@ -13,6 +13,7 @@ export default function ATMLogin() {
     e.preventDefault();
     setError("");
 
+    // Basic Validation
     if (!cardNumber || !pin) {
       setError("Please enter card number and PIN");
       return;
@@ -22,7 +23,10 @@ export default function ATMLogin() {
       return;
     }
 
+    // Saving user data to Local Storage
     localStorage.setItem("atmUser", JSON.stringify({ cardNumber }));
+    
+    // Redirecting to ATM Dashboard
     router.push("/atm/dashboard");
   };
 
@@ -30,7 +34,7 @@ export default function ATMLogin() {
     <div className="min-h-screen flex items-center justify-center bg-[#FFFFFF]">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md border border-blue-200">
         <div className="text-center mb-8">
-          <h1 className="text-xl text-gray-700 mb-12">ATM Login</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">ATM Login</h1>
           <p className="text-gray-600">Enter your card details</p>
         </div>
 
@@ -46,7 +50,8 @@ export default function ATMLogin() {
                 setCardNumber(e.target.value.replace(/\D/g, "").slice(0, 16))
               }
               placeholder="1234 5678 9012 3456"
-              className="w-full px-4 py-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              // text-black added to ensure input text is visible (not white)
+              className="w-full px-4 py-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black outline-none"
               maxLength={16}
             />
           </div>
@@ -62,7 +67,8 @@ export default function ATMLogin() {
                 setPin(e.target.value.replace(/\D/g, "").slice(0, 4))
               }
               placeholder="****"
-              className="w-full px-4 py-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              // text-black added to ensure PIN dots are visible
+              className="w-full px-4 py-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black outline-none"
               maxLength={4}
             />
           </div>
@@ -84,7 +90,7 @@ export default function ATMLogin() {
         <div className="mt-6 text-center">
           <button
             onClick={() => router.push("/")}
-            className="text-blue-600 hover:underline text-sm"
+            className="text-blue-600 hover:underline text-sm font-medium"
           >
             Back to Home
           </button>
