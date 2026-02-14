@@ -1,10 +1,8 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
   // Allowed dev origins for CORS in dev mode
-  allowedDevOrigins: ['http://192.168.0.101:3000'],
+  // allowedDevOrigins: ['http://192.168.0.101:3000'],
 };
 
-module.exports = nextConfig;
+export default nextConfig;
