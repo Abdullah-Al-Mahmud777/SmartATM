@@ -26,10 +26,10 @@ export default function Home() {
               userLogin
             </button>
             <button 
-              onClick={() => router.push('/admin/login')}
+              onClick={() => router.push('/atm/emergency')}
               className="px-8 py-3 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors"
             >
-              Admin Login
+             Emergency Services
             </button>
           </div>
         </div>

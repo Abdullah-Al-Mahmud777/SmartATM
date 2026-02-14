@@ -9,11 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "chart.js": "^4.5.1",
+    "jspdf": "^4.1.0",
     "lucide-react": "latest",
     "mongodb": "latest",
     "mongoose": "latest",
     "next": "^16.1.6",
     "react": "19.0.0",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "19.0.0"
   },
   "devDependencies": {
