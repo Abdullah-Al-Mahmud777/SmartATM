@@ -42,8 +42,8 @@ export default function Transactions() {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Transaction Management</h1>
-            <p className="text-gray-600">View and monitor all transactions</p>
+            <h1 className="text-4xl font-bold text-black mb-2">Transaction Management</h1>
+            <p className="text-black font-medium opacity-80">View and monitor all transactions</p>
           </div>
           <Link href="/admin/dashboard" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold">
             ← Back to Dashboard
@@ -53,24 +53,24 @@ export default function Transactions() {
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white p-4 rounded-lg shadow">
-            <p className="text-gray-600 text-sm">Total Transactions</p>
-            <p className="text-2xl font-bold text-gray-800">{filteredTransactions.length}</p>
+            <p className="text-black text-sm font-bold">Total Transactions</p>
+            <p className="text-2xl font-bold text-black">{filteredTransactions.length}</p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
-            <p className="text-gray-600 text-sm">Completed</p>
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-black text-sm font-bold">Completed</p>
+            <p className="text-2xl font-bold text-green-700">
               {filteredTransactions.filter(t => t.status === 'Completed').length}
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
-            <p className="text-gray-600 text-sm">Pending</p>
-            <p className="text-2xl font-bold text-yellow-600">
+            <p className="text-black text-sm font-bold">Pending</p>
+            <p className="text-2xl font-bold text-yellow-700">
               {filteredTransactions.filter(t => t.status === 'Pending').length}
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
-            <p className="text-gray-600 text-sm">Total Amount</p>
-            <p className="text-2xl font-bold text-purple-600">৳{totalAmount.toLocaleString()}</p>
+            <p className="text-black text-sm font-bold">Total Amount</p>
+            <p className="text-2xl font-bold text-purple-700">৳{totalAmount.toLocaleString()}</p>
           </div>
         </div>
 
@@ -82,12 +82,12 @@ export default function Transactions() {
               placeholder="Search by ID, user, or account..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-black font-medium"
             />
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-black font-medium"
             >
               <option value="All">All Types</option>
               <option value="Withdraw">Withdraw</option>
@@ -98,7 +98,7 @@ export default function Transactions() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-black font-medium"
             >
               <option value="All">All Status</option>
               <option value="Completed">Completed</option>
@@ -112,46 +112,46 @@ export default function Transactions() {
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-100">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Transaction ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Account</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date & Time</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase">Transaction ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase">User</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase">Account</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase">Type</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase">Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase">Date & Time</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredTransactions.map((txn) => (
-                  <tr key={txn.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 font-mono text-sm text-gray-800">{txn.id}</td>
-                    <td className="px-6 py-4 font-semibold text-gray-800">{txn.user}</td>
-                    <td className="px-6 py-4 text-gray-600">{txn.account}</td>
+                  <tr key={txn.id} className="hover:bg-gray-50 transition">
+                    <td className="px-6 py-4 font-mono text-sm text-black font-medium">{txn.id}</td>
+                    <td className="px-6 py-4 font-bold text-black">{txn.user}</td>
+                    <td className="px-6 py-4 text-black font-medium">{txn.account}</td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        txn.type === 'Withdraw' ? 'bg-red-100 text-red-800' :
-                        txn.type === 'Deposit' ? 'bg-green-100 text-green-800' :
-                        txn.type === 'Transfer' ? 'bg-blue-100 text-blue-800' :
-                        'bg-purple-100 text-purple-800'
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        txn.type === 'Withdraw' ? 'bg-red-100 text-red-900' :
+                        txn.type === 'Deposit' ? 'bg-green-100 text-green-900' :
+                        txn.type === 'Transfer' ? 'bg-blue-100 text-blue-900' :
+                        'bg-purple-100 text-purple-900'
                       }`}>
                         {txn.type}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-bold text-gray-800">{txn.amount}</td>
+                    <td className="px-6 py-4 font-black text-black">{txn.amount}</td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        txn.status === 'Completed' ? 'bg-green-100 text-green-800' :
-                        txn.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        txn.status === 'Completed' ? 'bg-green-100 text-green-900' :
+                        txn.status === 'Pending' ? 'bg-yellow-100 text-yellow-900' :
+                        'bg-red-100 text-red-900'
                       }`}>
                         {txn.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      <div>{txn.date}</div>
-                      <div className="text-xs text-gray-500">{txn.time}</div>
+                    <td className="px-6 py-4 text-sm text-black">
+                      <div className="font-bold">{txn.date}</div>
+                      <div className="text-xs font-medium opacity-70">{txn.time}</div>
                     </td>
                   </tr>
                 ))}
