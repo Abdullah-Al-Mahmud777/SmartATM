@@ -124,23 +124,27 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <Link href="/admin/users" className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition text-center">
             <div className="text-3xl mb-2">👥</div>
             <h3 className="font-semibold text-gray-800">Manage Users</h3>
           </Link>
           <Link href="/admin/transactions" className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition text-center">
             <div className="text-3xl mb-2">💳</div>
-            <h3 className="font-semibold text-gray-800">View Transactions</h3>
+            <h3 className="font-semibold text-gray-800">Transactions</h3>
           </Link>
-          <Link href="/admin/reports" className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition text-center">
-            <div className="text-3xl mb-2">📊</div>
-            <h3 className="font-semibold text-gray-800">Reports</h3>
+          <Link href="/admin/analytics" className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition text-center">
+            <div className="text-3xl mb-2">📉</div>
+            <h3 className="font-semibold text-gray-800">Analytics</h3>
           </Link>
-          <button className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition text-center">
-            <div className="text-3xl mb-2">⚙️</div>
-            <h3 className="font-semibold text-gray-800">Settings</h3>
-          </button>
+          <Link href="/admin/atm-monitoring" className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition text-center">
+            <div className="text-3xl mb-2">🏧</div>
+            <h3 className="font-semibold text-gray-800">ATM Monitor</h3>
+          </Link>
+          <Link href="/admin/security" className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition text-center">
+            <div className="text-3xl mb-2">🔒</div>
+            <h3 className="font-semibold text-gray-800">Security</h3>
+          </Link>
         </div>
 
         {/* Recent Activity */}

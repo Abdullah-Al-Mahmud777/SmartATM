@@ -11,6 +11,11 @@ export default function AdminSidebar() {
     { name: 'Users', path: '/admin/users', icon: '👥' },
     { name: 'Transactions', path: '/admin/transactions', icon: '💳' },
     { name: 'Reports', path: '/admin/reports', icon: '📈' },
+    { name: 'Analytics', path: '/admin/analytics', icon: '📉' },
+    { name: 'ATM Monitoring', path: '/admin/atm-monitoring', icon: '🏧' },
+    { name: 'Notifications', path: '/admin/notifications', icon: '🔔' },
+    { name: 'Security', path: '/admin/security', icon: '🔒' },
+    { name: 'Settings', path: '/admin/settings', icon: '⚙️' },
   ];
 
   return (
