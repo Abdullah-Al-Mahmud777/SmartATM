@@ -28,7 +28,7 @@ export default function CurrencyConverter() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 text-black">
       <div className="bg-teal-600 text-white p-6 shadow-lg">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold">💱 Currency Converter</h1>
@@ -50,7 +50,7 @@ export default function CurrencyConverter() {
         </div>
 
         {/* Converter */}
-        <div className="bg-white p-8 rounded-xl shadow-lg">
+        <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
           <div className="space-y-6">
             {/* BDT Input */}
             <div>
@@ -67,7 +67,8 @@ export default function CurrencyConverter() {
                     convertToUSD(e.target.value);
                   }}
                   placeholder="0.00"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-lg"
+                  // এখানে text-black এবং bg-white যোগ করা হয়েছে
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-lg text-black bg-white outline-none"
                 />
               </div>
             </div>
@@ -75,7 +76,7 @@ export default function CurrencyConverter() {
             {/* Swap Icon */}
             <div className="flex justify-center">
               <div className="bg-teal-100 p-3 rounded-full">
-                <span className="text-2xl">⇅</span>
+                <span className="text-2xl text-teal-700">⇅</span>
               </div>
             </div>
 
@@ -94,7 +95,8 @@ export default function CurrencyConverter() {
                     convertToBDT(e.target.value);
                   }}
                   placeholder="0.00"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-lg"
+                  // এখানেও text-black এবং bg-white যোগ করা হয়েছে
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-lg text-black bg-white outline-none"
                 />
               </div>
             </div>
