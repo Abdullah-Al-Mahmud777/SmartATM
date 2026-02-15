@@ -30,43 +30,39 @@ export default function Notifications() {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Notification Center</h1>
-            <p className="text-gray-600">Send announcements and alerts to users</p>
+            {/* text-gray-800 থেকে text-black করা হয়েছে */}
+            <h1 className="text-4xl font-bold text-black mb-2">Notification Center</h1>
+            <p className="text-black opacity-80">Send announcements and alerts to users</p>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white p-4 rounded-lg shadow">
-              <p className="text-gray-600 text-sm">Total Sent</p>
-              <p className="text-2xl font-bold text-gray-800">{sentNotifications.length}</p>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow">
-              <p className="text-gray-600 text-sm">Today</p>
-              <p className="text-2xl font-bold text-blue-600">2</p>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow">
-              <p className="text-gray-600 text-sm">Delivery Rate</p>
-              <p className="text-2xl font-bold text-green-600">98.5%</p>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow">
-              <p className="text-gray-600 text-sm">Open Rate</p>
-              <p className="text-2xl font-bold text-purple-600">85.2%</p>
-            </div>
+            {[
+              { label: 'Total Sent', value: sentNotifications.length, color: 'text-black' },
+              { label: 'Today', value: '2', color: 'text-blue-600' },
+              { label: 'Delivery Rate', value: '98.5%', color: 'text-green-600' },
+              { label: 'Open Rate', value: '85.2%', color: 'text-purple-600' },
+            ].map((stat, index) => (
+              <div key={index} className="bg-white p-4 rounded-lg shadow">
+                <p className="text-black text-sm font-medium">{stat.label}</p>
+                <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+              </div>
+            ))}
           </div>
 
           {/* Send Notification Form */}
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Send New Notification</h2>
+            <h2 className="text-2xl font-bold text-black mb-4">Send New Notification</h2>
             <form onSubmit={handleSendNotification} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-black mb-2">
                     Notification Type
                   </label>
                   <select
                     value={notificationType}
                     onChange={(e) => setNotificationType(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-black"
                   >
                     <option value="all">All Types</option>
                     <option value="system">System</option>
@@ -78,13 +74,13 @@ export default function Notifications() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-black mb-2">
                     Target Users
                   </label>
                   <select
                     value={targetUsers}
                     onChange={(e) => setTargetUsers(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-black"
                   >
                     <option value="all">All Users</option>
                     <option value="active">Active Users</option>
@@ -96,28 +92,28 @@ export default function Notifications() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-black mb-2">
                   Notification Title
                 </label>
                 <input
                   type="text"
                   value={notificationTitle}
                   onChange={(e) => setNotificationTitle(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-black"
                   placeholder="Enter notification title"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-black mb-2">
                   Message
                 </label>
                 <textarea
                   value={notificationMessage}
                   onChange={(e) => setNotificationMessage(e.target.value)}
                   rows="4"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-black"
                   placeholder="Enter notification message"
                   required
                 ></textarea>
@@ -142,15 +138,15 @@ export default function Notifications() {
 
           {/* Sent Notifications History */}
           <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Notification History</h2>
+            <h2 className="text-2xl font-bold text-black mb-4">Notification History</h2>
             <div className="space-y-3">
               {sentNotifications.map((notification) => (
                 <div key={notification.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-bold text-gray-800">{notification.title}</h3>
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        <h3 className="font-bold text-black">{notification.title}</h3>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                           notification.type === 'System' ? 'bg-blue-100 text-blue-800' :
                           notification.type === 'Security' ? 'bg-red-100 text-red-800' :
                           notification.type === 'Feature' ? 'bg-green-100 text-green-800' :
@@ -158,17 +154,17 @@ export default function Notifications() {
                         }`}>
                           {notification.type}
                         </span>
-                        <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                        <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold">
                           {notification.status}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">{notification.message}</p>
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <p className="text-sm text-black mb-2 font-medium">{notification.message}</p>
+                      <div className="flex items-center gap-4 text-xs text-black font-semibold">
                         <span>👥 {notification.target}</span>
                         <span>📅 {notification.sentAt}</span>
                       </div>
                     </div>
-                    <button className="ml-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold">
+                    <button className="ml-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-black rounded-lg text-sm font-bold">
                       View Details
                     </button>
                   </div>
