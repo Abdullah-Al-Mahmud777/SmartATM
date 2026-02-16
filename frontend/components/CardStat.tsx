@@ -2,7 +2,7 @@ interface CardStatProps {
   title: string;
   value: string | number;
   icon: string;
-  color: string;
+  color: string; 
 }
 
 export default function CardStat({ title, value, icon, color }: CardStatProps) {
