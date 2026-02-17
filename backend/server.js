@@ -1,26 +1,100 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const cors = require('cors');
+require('dotenv').config();
+
+const connectDB = require('./config/database');
+const authRoutes = require('./routes/auth');
+const transactionRoutes = require('./routes/transactions');
+
 const app = express();
 
-// এখানে আপনার ডাটাবেস নাম 'smart_atm_db' সেট করে দেওয়া হয়েছে
-const MONGO_URI = "mongodb+srv://shuvo:1234@cluster0.bfd2hb1.mongodb.net/smart_atm_db?retryWrites=true&w=majority";
+// Connect to Database
+connectDB();
 
-mongoose.connect(MONGO_URI)
-    .then(() => console.log("✅ MongoDB Atlas Connected!"))
-    .catch(err => console.log("❌ Connection Error:", err));
+// Middleware
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  credentials: true
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// একটি সিম্পল মডেল তৈরি করা
-const User = mongoose.model('User', { name: String, balance: Number });
+// Request Logger Middleware (Development)
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
+    next();
+  });
+}
 
-// ২. এই রুটটি কল করলেই ডাটাবেস তৈরি হবে
-app.get('/create-db', async (req, res) => {
-    try {
-        const testUser = new User({ name: "Shuvo", balance: 1000 });
-        await testUser.save(); // এই লাইনটি আসল কাজ করবে
-        res.send("<h1>অভিনন্দন!</h1><p>ডাটাবেস তৈরি হয়েছে এবং একটি ডাটা সেভ হয়েছে। এখন Atlas-এ চেক করুন।</p>");
-    } catch (err) {
-        res.status(500).send("ভুল হয়েছে: " + err.message);
-    }
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/transactions', transactionRoutes);
+
+// Root Route - API Documentation
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'SmartATM Backend API', 
+    version: '1.0.0',
+    status: 'Running',
+    endpoints: {
+      authentication: {
+        login: 'POST /api/auth/login',
+        register: 'POST /api/auth/register',
+        profile: 'GET /api/auth/profile (Protected)',
+        updateProfile: 'PUT /api/auth/profile (Protected)',
+        changePin: 'POST /api/auth/change-pin (Protected)'
+      },
+      transactions: {
+        withdraw: 'POST /api/transactions/withdraw (Protected)',
+        deposit: 'POST /api/transactions/deposit (Protected)',
+        transfer: 'POST /api/transactions/transfer (Protected)',
+        history: 'GET /api/transactions/history (Protected)',
+        balance: 'GET /api/transactions/balance (Protected)'
+      }
+    },
+    documentation: 'See README.md for detailed API documentation'
+  });
 });
 
-app.listen(5000, () => console.log("🚀 সার্ভার চলছে http://localhost:5000 এ"));
+// Health Check Route
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
+// 404 Handler
+app.use((req, res) => {
+  res.status(404).json({ 
+    success: false, 
+    message: 'Route not found' 
+  });
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('Error:', err.stack);
+  res.status(err.status || 500).json({ 
+    success: false, 
+    message: err.message || 'Something went wrong!',
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+  });
+});
+
+// Start Server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔗 API Documentation: http://localhost:${PORT}`);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.error('❌ Unhandled Promise Rejection:', err);
+  // Close server & exit process
+  process.exit(1);
+});
