@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { API_ENDPOINTS } from "@/lib/config";
 
 export default function ATMLogin() {
   const router = useRouter();
@@ -28,8 +29,8 @@ export default function ATMLogin() {
     }
 
     try {
-      // Call backend API
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      // Call backend API using config
+      const response = await fetch(API_ENDPOINTS.auth.login, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
