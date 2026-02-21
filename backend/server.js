@@ -12,6 +12,7 @@ const cardRoutes = require('./routes/card');
 const receiptRoutes = require('./routes/receipt');
 const transferRoutes = require('./routes/transfer');
 const emergencyRoutes = require('./routes/emergency');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use('/api/card', cardRoutes);
 app.use('/api/receipt', receiptRoutes);
 app.use('/api/transfer', transferRoutes);
 app.use('/api/emergency', emergencyRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Root Route - API Documentation
 app.get('/', (req, res) => {
@@ -110,6 +112,16 @@ app.get('/', (req, res) => {
         status: 'GET /api/emergency/status/:emergencyId (Public)',
         helplineNumbers: 'GET /api/emergency/helpline-numbers (Public)',
         myEmergencies: 'GET /api/emergency/my-emergencies (Protected)'
+      },
+      admin: {
+        login: 'POST /api/admin/login (Public)',
+        profile: 'GET /api/admin/profile (Protected)',
+        dashboardStats: 'GET /api/admin/dashboard/stats (Protected)',
+        users: 'GET /api/admin/users (Protected)',
+        toggleUserStatus: 'PUT /api/admin/users/:userId/status (Protected)',
+        transactions: 'GET /api/admin/transactions (Protected)',
+        emergencies: 'GET /api/admin/emergencies (Protected)',
+        createAdmin: 'POST /api/admin/create (Super Admin Only)'
       }
     }
   });
