@@ -5,6 +5,8 @@ require('dotenv').config();
 const connectDB = require('./config/database');
 const authRoutes = require('./routes/auth');
 const transactionRoutes = require('./routes/transactions');
+const currencyRoutes = require('./routes/currency');
+const limitRoutes = require('./routes/limits');
 
 const app = express();
 
@@ -34,6 +36,8 @@ if (process.env.NODE_ENV !== 'production') {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/currency', currencyRoutes);
+app.use('/api/limits', limitRoutes);
 
 // Root Route - API Documentation
 app.get('/', (req, res) => {
@@ -55,6 +59,15 @@ app.get('/', (req, res) => {
         transfer: 'POST /api/transactions/transfer (Protected)',
         history: 'GET /api/transactions/history (Protected)',
         balance: 'GET /api/transactions/balance (Protected)'
+      },
+      currency: {
+        rates: 'GET /api/currency/rates',
+        convert: 'POST /api/currency/convert (Protected)',
+        currencies: 'GET /api/currency/currencies'
+      },
+      limits: {
+        get: 'GET /api/limits (Protected)',
+        update: 'PUT /api/limits (Protected)'
       }
     }
   });

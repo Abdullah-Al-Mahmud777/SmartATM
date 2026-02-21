@@ -3,28 +3,94 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+const API_URL = 'http://localhost:5000';
+
+interface Currency {
+  code: string;
+  name: string;
+  symbol: string;
+}
+
 export default function CurrencyConverter() {
   const router = useRouter();
-  const [bdtAmount, setBdtAmount] = useState('');
-  const [usdAmount, setUsdAmount] = useState('');
-  const [exchangeRate] = useState(110); // 1 USD = 110 BDT (example rate)
+  const [fromAmount, setFromAmount] = useState('');
+  const [toAmount, setToAmount] = useState('');
+  const [fromCurrency, setFromCurrency] = useState('BDT');
+  const [toCurrency, setToCurrency] = useState('USD');
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const convertToUSD = (bdt: string) => {
-    const amount = parseFloat(bdt);
-    if (!isNaN(amount)) {
-      setUsdAmount((amount / exchangeRate).toFixed(2));
-    } else {
-      setUsdAmount('');
+  useEffect(() => {
+    fetchCurrencies();
+  }, []);
+
+  const fetchCurrencies = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/currency/currencies`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setCurrencies(data.currencies);
+      }
+    } catch (error) {
+      console.error('Error fetching currencies:', error);
     }
   };
 
-  const convertToBDT = (usd: string) => {
-    const amount = parseFloat(usd);
-    if (!isNaN(amount)) {
-      setBdtAmount((amount * exchangeRate).toFixed(2));
-    } else {
-      setBdtAmount('');
+  const convertCurrency = async (amount: string, from: string, to: string) => {
+    if (!amount || parseFloat(amount) <= 0) {
+      setToAmount('');
+      return;
     }
+
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem('atmToken');
+      
+      const response = await fetch(`${API_URL}/api/currency/convert`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: JSON.stringify({
+          amount: parseFloat(amount),
+          fromCurrency: from,
+          toCurrency: to
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setToAmount(data.conversion.convertedAmount.toString());
+      }
+    } catch (error) {
+      console.error('Conversion error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFromAmountChange = (value: string) => {
+    setFromAmount(value);
+    convertCurrency(value, fromCurrency, toCurrency);
+  };
+
+  const handleSwapCurrencies = () => {
+    const tempCurrency = fromCurrency;
+    setFromCurrency(toCurrency);
+    setToCurrency(tempCurrency);
+    
+    const tempAmount = fromAmount;
+    setFromAmount(toAmount);
+    setToAmount(tempAmount);
+  };
+
+  const getCurrencySymbol = (code: string) => {
+    const currency = currencies.find(c => c.code === code);
+    return currency?.symbol || code;
   };
 
   return (
@@ -36,97 +102,97 @@ export default function CurrencyConverter() {
             onClick={() => router.push('/atm/dashboard')}
             className="bg-white text-teal-600 px-4 py-2 rounded-lg font-semibold hover:bg-teal-50"
           >
-            Back to Dashboard
+            Back
           </button>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Exchange Rate Display */}
-        <div className="bg-gradient-to-r from-teal-600 to-blue-600 text-white p-6 rounded-xl shadow-lg mb-8">
-          <p className="text-sm opacity-90 mb-2">Current Exchange Rate</p>
-          <h2 className="text-3xl font-bold">1 USD = ৳{exchangeRate}</h2>
-          <p className="text-sm opacity-75 mt-2">Last updated: Today, 10:30 AM</p>
-        </div>
-
-        {/* Converter */}
-        <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+        <div className="bg-white p-8 rounded-xl shadow-lg">
           <div className="space-y-6">
-            {/* BDT Input */}
+            {/* From Currency */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bangladeshi Taka (BDT)
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-3 text-gray-500 text-lg">৳</span>
+              <label className="block text-sm font-medium text-gray-700 mb-2">From</label>
+              <div className="flex gap-3">
+                <select
+                  value={fromCurrency}
+                  onChange={(e) => {
+                    setFromCurrency(e.target.value);
+                    convertCurrency(fromAmount, e.target.value, toCurrency);
+                  }}
+                  className="w-32 px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-black bg-white outline-none"
+                >
+                  {currencies.map((currency) => (
+                    <option key={currency.code} value={currency.code}>
+                      {currency.code}
+                    </option>
+                  ))}
+                </select>
                 <input
                   type="number"
-                  value={bdtAmount}
-                  onChange={(e) => {
-                    setBdtAmount(e.target.value);
-                    convertToUSD(e.target.value);
-                  }}
+                  value={fromAmount}
+                  onChange={(e) => handleFromAmountChange(e.target.value)}
                   placeholder="0.00"
-                  // এখানে text-black এবং bg-white যোগ করা হয়েছে
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-lg text-black bg-white outline-none"
+                  disabled={loading}
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-lg text-black bg-white outline-none"
                 />
               </div>
             </div>
 
-            {/* Swap Icon */}
+            {/* Swap Button */}
             <div className="flex justify-center">
-              <div className="bg-teal-100 p-3 rounded-full">
+              <button
+                onClick={handleSwapCurrencies}
+                className="bg-teal-100 p-3 rounded-full hover:bg-teal-200 transition"
+              >
                 <span className="text-2xl text-teal-700">⇅</span>
-              </div>
+              </button>
             </div>
 
-            {/* USD Input */}
+            {/* To Currency */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                US Dollar (USD)
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-3 text-gray-500 text-lg">$</span>
+              <label className="block text-sm font-medium text-gray-700 mb-2">To</label>
+              <div className="flex gap-3">
+                <select
+                  value={toCurrency}
+                  onChange={(e) => {
+                    setToCurrency(e.target.value);
+                    convertCurrency(fromAmount, fromCurrency, e.target.value);
+                  }}
+                  className="w-32 px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-black bg-white outline-none"
+                >
+                  {currencies.map((currency) => (
+                    <option key={currency.code} value={currency.code}>
+                      {currency.code}
+                    </option>
+                  ))}
+                </select>
                 <input
                   type="number"
-                  value={usdAmount}
-                  onChange={(e) => {
-                    setUsdAmount(e.target.value);
-                    convertToBDT(e.target.value);
-                  }}
+                  value={toAmount}
+                  readOnly
                   placeholder="0.00"
-                  // এখানেও text-black এবং bg-white যোগ করা হয়েছে
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-lg text-black bg-white outline-none"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-lg text-black outline-none"
                 />
               </div>
             </div>
           </div>
 
-          {/* Quick Convert Buttons */}
+          {/* Quick Convert */}
           <div className="mt-8">
             <p className="text-sm font-medium text-gray-700 mb-3">Quick Convert</p>
             <div className="grid grid-cols-4 gap-3">
               {[1000, 5000, 10000, 50000].map((amount) => (
                 <button
                   key={amount}
-                  onClick={() => {
-                    setBdtAmount(amount.toString());
-                    convertToUSD(amount.toString());
-                  }}
-                  className="bg-teal-100 text-teal-700 py-2 rounded-lg font-semibold hover:bg-teal-200 transition-colors"
+                  onClick={() => handleFromAmountChange(amount.toString())}
+                  className="bg-teal-100 text-teal-700 py-2 rounded-lg font-semibold hover:bg-teal-200 transition"
                 >
                   ৳{amount}
                 </button>
               ))}
             </div>
           </div>
-        </div>
-
-        {/* Info */}
-        <div className="mt-6 bg-yellow-50 p-4 rounded-lg">
-          <p className="text-sm text-yellow-800">
-            ⚠️ Note: Exchange rates are indicative and may vary. Actual rates will be applied at the time of transaction.
-          </p>
         </div>
       </div>
     </div>
