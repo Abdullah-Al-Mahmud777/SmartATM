@@ -9,8 +9,9 @@ router.post('/login', adminController.login);
 // Protected routes (require admin authentication)
 router.use(verifyAdminToken);
 
-// Admin profile
+// Admin profile and logout
 router.get('/profile', adminController.getProfile);
+router.post('/logout', adminController.logout);
 
 // Dashboard statistics
 router.get('/dashboard/stats', adminController.getDashboardStats);

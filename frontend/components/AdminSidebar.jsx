@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const menuItems = [
@@ -19,6 +20,18 @@ export default function AdminSidebar() {
     { name: 'Security', path: '/admin/security', icon: '🔒' },
     { name: 'Settings', path: '/admin/settings', icon: '⚙️' },
   ];
+
+  const handleLogout = () => {
+    // Clear all admin data from localStorage
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminData');
+    
+    // Close mobile menu
+    setIsMobileMenuOpen(false);
+    
+    // Redirect to login page
+    router.push('/admin/login');
+  };
 
   return (
     <>
@@ -73,14 +86,13 @@ export default function AdminSidebar() {
 
         {/* Logout */}
         <div className="mt-8 pt-8 border-t border-gray-700">
-          <Link
-            href="/admin/login"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition"
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition"
           >
             <span className="text-xl">🚪</span>
             <span className="font-medium">Logout</span>
-          </Link>
+          </button>
         </div>
       </div>
     </>

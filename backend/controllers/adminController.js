@@ -64,6 +64,10 @@ exports.login = async (req, res) => {
     // Reset login attempts on successful login
     await admin.resetLoginAttempts();
 
+    // Update last login
+    admin.lastLogin = new Date();
+    await admin.save();
+
     // Generate token
     const token = generateToken(admin._id);
 
@@ -83,6 +87,26 @@ exports.login = async (req, res) => {
 
   } catch (error) {
     console.error('Admin login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error. Please try again.'
+    });
+  }
+};
+
+// Admin Logout
+exports.logout = async (req, res) => {
+  try {
+    // In a JWT-based system, logout is handled client-side by removing the token
+    // But we can log the logout event here if needed
+    
+    res.json({
+      success: true,
+      message: 'Logout successful'
+    });
+
+  } catch (error) {
+    console.error('Admin logout error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error. Please try again.'
