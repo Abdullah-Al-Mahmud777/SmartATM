@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const transferSchema = new mongoose.Schema({
   transferId: {
     type: String,
-    required: true,
-    unique: true
+    required: true
   },
   transactionId: {
     type: String,
@@ -104,7 +103,7 @@ transferSchema.index({ senderUserId: 1, createdAt: -1 });
 transferSchema.index({ recipientUserId: 1, createdAt: -1 });
 transferSchema.index({ transactionId: 1 });
 transferSchema.index({ status: 1 });
-// Note: transferId already has unique index from schema definition
+transferSchema.index({ transferId: 1 }, { unique: true });
 
 // Virtual for total amount including fee
 transferSchema.virtual('totalAmount').get(function() {

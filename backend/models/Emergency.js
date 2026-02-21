@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const emergencySchema = new mongoose.Schema({
   emergencyId: {
     type: String,
-    required: true,
-    unique: true
+    required: true
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -84,7 +83,7 @@ const emergencySchema = new mongoose.Schema({
 
 // Indexes for faster queries
 emergencySchema.index({ userId: 1, createdAt: -1 });
-emergencySchema.index({ emergencyId: 1 });
+emergencySchema.index({ emergencyId: 1 }, { unique: true });
 emergencySchema.index({ type: 1, status: 1 });
 emergencySchema.index({ cardNumber: 1 });
 emergencySchema.index({ status: 1, priority: 1 });

@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const receiptSchema = new mongoose.Schema({
   receiptId: {
     type: String,
-    required: true,
-    unique: true
+    required: true
   },
   transactionId: {
     type: String,
@@ -72,6 +71,6 @@ const receiptSchema = new mongoose.Schema({
 // Index for faster queries (userId and createdAt composite index)
 receiptSchema.index({ userId: 1, createdAt: -1 });
 receiptSchema.index({ transactionId: 1 });
-// Note: receiptId already has unique index from schema definition
+receiptSchema.index({ receiptId: 1 }, { unique: true });
 
 module.exports = mongoose.model('Receipt', receiptSchema);
