@@ -1,13 +1,61 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import CardStat from '@/components/CardStat';
+import { useAuth } from '@/lib/useAuth';
+
+const API_URL = 'http://localhost:5000';
 
 export default function ATMDashboard() {
   const router = useRouter();
-  const balance = 50000;
-  const cardNumber = '1234567812345678';
+  const { isAuthenticated, loading, user, logout } = useAuth();
+  const [balance, setBalance] = useState(0);
+  const [loadingBalance, setLoadingBalance] = useState(true);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchBalance();
+    }
+  }, [isAuthenticated]);
+
+  const fetchBalance = async () => {
+    try {
+      const token = localStorage.getItem('atmToken');
+      const response = await fetch(`${API_URL}/api/transactions/balance`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setBalance(data.balance);
+      }
+    } catch (error) {
+      console.error('Error fetching balance:', error);
+    } finally {
+      setLoadingBalance(false);
+    }
+  };
+
+  // Show loading screen while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not authenticated, useAuth hook will redirect to login
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const mainMenuItems = [
     { title: 'Withdraw', icon: '💵', path: '/atm/withdraw', color: 'bg-green-500' },
@@ -38,20 +86,20 @@ export default function ATMDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <CardStat
             title="Available Balance"
-            value={`৳${balance.toLocaleString()}`}
+            value={loadingBalance ? 'Loading...' : `৳${balance.toLocaleString()}`}
             icon="💰"
             color="bg-gradient-to-r from-blue-600 to-purple-600"
           />
           <CardStat
             title="Card Number"
-            value={`**** ${cardNumber.slice(-4)}`}
+            value={user?.cardNumber ? `**** ${user.cardNumber.slice(-4)}` : '****'}
             icon="💳"
             color="bg-gradient-to-r from-green-600 to-teal-600"
           />
           <CardStat
-            title="Account Status"
-            value="Active"
-            icon="✅"
+            title="Account Holder"
+            value={user?.name || 'User'}
+            icon="👤"
             color="bg-gradient-to-r from-orange-600 to-red-600"
           />
         </div>
@@ -88,6 +136,16 @@ export default function ATMDashboard() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Logout Button */}
+        <div className="mt-8 text-center">
+          <button
+            onClick={logout}
+            className="bg-red-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors shadow-lg"
+          >
+            🚪 Logout
+          </button>
         </div>
       </div>
     </div>

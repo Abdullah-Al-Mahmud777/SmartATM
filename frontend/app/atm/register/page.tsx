@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 // Use environment variable for backend URL
@@ -8,6 +8,25 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export default function ATMRegister() {
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  // Check if user is already logged in
+  useEffect(() => {
+    const token = localStorage.getItem('atmToken');
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('atmToken');
+    localStorage.removeItem('atmUser');
+    setIsLoggedIn(false);
+  };
+
+  const goToDashboard = () => {
+    router.push('/atm/dashboard');
+  };
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -80,6 +99,46 @@ export default function ATMRegister() {
       setLoading(false);
     }
   };
+
+  // If already logged in, show option to go to dashboard or logout
+  if (isLoggedIn) {
+    const userData = JSON.parse(localStorage.getItem('atmUser') || '{}');
+    
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border border-blue-200">
+          <div className="text-center mb-8">
+            <div className="text-5xl mb-4">✅</div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Already Logged In</h1>
+            <p className="text-gray-600">Welcome, {userData.name || 'User'}!</p>
+          </div>
+
+          <div className="space-y-4">
+            <button
+              onClick={goToDashboard}
+              className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            >
+              Go to Dashboard
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="w-full py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+            >
+              Logout & Create New Account
+            </button>
+
+            <button
+              onClick={() => router.push("/")}
+              className="w-full py-3 bg-white text-gray-600 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+            >
+              Back to Home
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 py-8">
