@@ -7,6 +7,8 @@ const authRoutes = require('./routes/auth');
 const transactionRoutes = require('./routes/transactions');
 const currencyRoutes = require('./routes/currency');
 const limitRoutes = require('./routes/limits');
+const analyticsRoutes = require('./routes/analytics');
+const cardRoutes = require('./routes/card');
 
 const app = express();
 
@@ -38,6 +40,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/currency', currencyRoutes);
 app.use('/api/limits', limitRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/card', cardRoutes);
 
 // Root Route - API Documentation
 app.get('/', (req, res) => {
@@ -68,6 +72,16 @@ app.get('/', (req, res) => {
       limits: {
         get: 'GET /api/limits (Protected)',
         update: 'PUT /api/limits (Protected)'
+      },
+      analytics: {
+        overview: 'GET /api/analytics (Protected)',
+        spending: 'GET /api/analytics/spending (Protected)'
+      },
+      card: {
+        block: 'POST /api/card/block (Protected)',
+        unblock: 'POST /api/card/unblock (Protected)',
+        status: 'GET /api/card/status (Protected)',
+        report: 'POST /api/card/report (Protected)'
       }
     }
   });

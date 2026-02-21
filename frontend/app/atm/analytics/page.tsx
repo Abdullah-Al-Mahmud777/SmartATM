@@ -1,22 +1,83 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+
+const API_URL = 'http://localhost:5000';
 
 export default function Analytics() {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [spending, setSpending] = useState<any>(null);
 
-  const expenses = 35000;
-  const savings = 15000;
+  useEffect(() => {
+    fetchAnalytics();
+  }, []);
+
+  const fetchAnalytics = async () => {
+    try {
+      const token = localStorage.getItem('atmToken');
+      if (!token) {
+        router.push('/atm/login');
+        return;
+      }
+
+      // Fetch overview analytics
+      const overviewResponse = await fetch(`${API_URL}/api/analytics`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const overviewData = await overviewResponse.json();
+
+      // Fetch spending insights
+      const spendingResponse = await fetch(`${API_URL}/api/analytics/spending`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const spendingData = await spendingResponse.json();
+
+      if (overviewData.success) {
+        setAnalytics(overviewData.analytics);
+      }
+
+      if (spendingData.success) {
+        setSpending(spendingData.spending);
+      }
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading analytics...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const expenses = analytics?.totalWithdrawals + analytics?.totalTransfers || 0;
+  const savings = analytics?.currentBalance || 0;
   const total = expenses + savings;
-  const savingsRate = Math.round((savings / total) * 100);
+  const savingsRate = total > 0 ? Math.round((savings / total) * 100) : 0;
 
-  const monthlyData = [
-    { month: 'Jan', expenses: 12000, savings: 8000 },
-    { month: 'Feb', expenses: 19000, savings: 11000 },
-    { month: 'Mar', expenses: 15000, savings: 13000 },
-    { month: 'Apr', expenses: 25000, savings: 15000 },
-    { month: 'May', expenses: 22000, savings: 18000 },
-    { month: 'Jun', expenses: 35000, savings: 15000 },
+  const monthlyData = spending?.monthlyBreakdown || [
+    { month: 'Jan', expenses: 0, savings: 0 },
+    { month: 'Feb', expenses: 0, savings: 0 },
+    { month: 'Mar', expenses: 0, savings: 0 },
+    { month: 'Apr', expenses: 0, savings: 0 },
+    { month: 'May', expenses: 0, savings: 0 },
+    { month: 'Jun', expenses: 0, savings: 0 },
   ];
 
   return (
@@ -134,10 +195,12 @@ export default function Analytics() {
         <div className="bg-blue-50 p-6 rounded-xl">
           <h3 className="text-lg font-bold text-blue-900 mb-3">💡 Financial Insights</h3>
           <ul className="space-y-2 text-blue-800">
-            <li>• Your expenses increased by 15% compared to last month</li>
-            <li>• You saved {savingsRate}% of your income this month - Great job!</li>
-            <li>• Most spending: Transfers (45%), Withdrawals (35%)</li>
-            <li>• Tip: Try to increase savings to 40% next month</li>
+            <li>• Total Transactions: {analytics?.totalTransactions || 0}</li>
+            <li>• Total Withdrawals: ৳{(analytics?.totalWithdrawals || 0).toLocaleString()}</li>
+            <li>• Total Transfers: ৳{(analytics?.totalTransfers || 0).toLocaleString()}</li>
+            <li>• Total Deposits: ৳{(analytics?.totalDeposits || 0).toLocaleString()}</li>
+            <li>• Current Balance: ৳{(analytics?.currentBalance || 0).toLocaleString()}</li>
+            <li>• Average Transaction: ৳{(analytics?.averageTransaction || 0).toLocaleString()}</li>
           </ul>
         </div>
       </div>

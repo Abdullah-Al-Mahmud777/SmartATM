@@ -3,14 +3,17 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+const API_URL = 'http://localhost:5000';
+
 export default function ChangePin() {
   const router = useRouter();
   const [currentPin, setCurrentPin] = useState('');
   const [newPin, setNewPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleChangePin = (e: React.FormEvent) => {
+  const handleChangePin = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage('');
 
@@ -34,12 +37,48 @@ export default function ChangePin() {
       return;
     }
 
-    setMessage('PIN changed successfully!');
-    setTimeout(() => router.push('/atm/dashboard'), 2000);
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem('atmToken');
+      if (!token) {
+        router.push('/atm/login');
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/api/auth/change-pin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          currentPin,
+          newPin
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage('PIN changed successfully!');
+        setTimeout(() => router.push('/atm/dashboard'), 2000);
+      } else {
+        setMessage(data.message || 'Failed to change PIN');
+      }
+    } catch (error) {
+      console.error('Change PIN error:', error);
+      setMessage('Unable to connect to server');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    // Main Container-e text-black add kora hoyeche
+    <div className="min-h-screen bg-gray-100 text-black"> 
+      
+      {/* Header section (Ager motoi text-white thakbe) */}
       <div className="bg-indigo-600 text-white p-6 shadow-lg">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold">Change PIN</h1>
@@ -56,6 +95,7 @@ export default function ChangePin() {
         <div className="bg-white p-8 rounded-xl shadow-lg">
           <form onSubmit={handleChangePin} className="space-y-6">
             <div>
+              {/* Form labels ager motoi gray thakbe, input text black hobe */}
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Current PIN
               </label>
@@ -103,14 +143,17 @@ export default function ChangePin() {
               </div>
             )}
 
+            {/* Button ager motoi indigo thakbe */}
             <button
               type="submit"
-              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+              disabled={loading}
+              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              Change PIN
+              {loading ? 'Changing PIN...' : 'Change PIN'}
             </button>
           </form>
 
+          {/* Security Tips Section ager motoi blue theme-e thakbe */}
           <div className="mt-6 bg-blue-50 p-4 rounded-lg">
             <p className="text-sm text-blue-800">
               <strong>Security Tips:</strong>
