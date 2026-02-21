@@ -1,39 +1,102 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+
+const API_URL = 'http://localhost:5000';
 
 export default function Withdraw() {
   const router = useRouter();
   const [amount, setAmount] = useState('');
-  const [balance, setBalance] = useState(50000); // ব্যালেন্স আপডেট করার জন্য state ব্যবহার করা হয়েছে
+  const [balance, setBalance] = useState(0);
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const quickAmounts = [500, 1000, 2000, 5000, 10000];
 
-  const handleWithdraw = (withdrawAmount: number) => {
+  // Fetch user balance on load
+  useEffect(() => {
+    fetchBalance();
+  }, []);
+
+  const fetchBalance = async () => {
+    try {
+      const token = localStorage.getItem('atmToken');
+      if (!token) {
+        router.push('/atm/login');
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/api/transactions/balance`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setBalance(data.balance);
+      }
+    } catch (error) {
+      console.error('Error fetching balance:', error);
+    }
+  };
+
+  const handleWithdraw = async (withdrawAmount: number) => {
     setMessage('');
+    setLoading(true);
 
     if (!withdrawAmount || withdrawAmount <= 0) {
       setMessage('Please enter a valid amount');
+      setLoading(false);
       return;
     }
 
     if (withdrawAmount > balance) {
       setMessage('Insufficient balance');
+      setLoading(false);
       return;
     }
 
     if (withdrawAmount % 100 !== 0) {
       setMessage('Amount must be multiple of 100');
+      setLoading(false);
       return;
     }
 
-    setBalance(prev => prev - withdrawAmount);
-    setMessage(`Successfully withdrawn ৳${withdrawAmount}`);
-    setAmount(''); // সাকসেস হওয়ার পর ইনপুট খালি হবে
-    
-    setTimeout(() => router.push('/atm/dashboard'), 2000);
+    try {
+      const token = localStorage.getItem('atmToken');
+      if (!token) {
+        router.push('/atm/login');
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/api/transactions/withdraw`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ amount: withdrawAmount })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setBalance(data.balance);
+        setMessage(`Successfully withdrawn ৳${withdrawAmount}`);
+        setAmount('');
+        
+        setTimeout(() => router.push('/atm/dashboard'), 2000);
+      } else {
+        setMessage(data.message || 'Withdrawal failed');
+      }
+    } catch (error) {
+      console.error('Withdrawal error:', error);
+      setMessage('Unable to process withdrawal. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -66,7 +129,7 @@ export default function Withdraw() {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="Enter amount"
-              /* এখানে text-black এবং bg-white যোগ করা হয়েছে যাতে লিখা কালো দেখায় */
+              disabled={loading}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-black bg-white outline-none"
             />
           </div>
@@ -78,7 +141,8 @@ export default function Withdraw() {
                 <button
                   key={amt}
                   onClick={() => handleWithdraw(amt)}
-                  className="bg-green-100 text-green-700 py-3 rounded-lg font-semibold hover:bg-green-200 transition-colors"
+                  disabled={loading}
+                  className="bg-green-100 text-green-700 py-3 rounded-lg font-semibold hover:bg-green-200 transition-colors disabled:opacity-50"
                 >
                   ৳{amt}
                 </button>
@@ -94,9 +158,10 @@ export default function Withdraw() {
 
           <button
             onClick={() => handleWithdraw(Number(amount))}
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md"
+            disabled={loading}
+            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md disabled:opacity-50"
           >
-            Withdraw
+            {loading ? 'Processing...' : 'Withdraw'}
           </button>
         </div>
       </div>

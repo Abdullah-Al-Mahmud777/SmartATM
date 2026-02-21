@@ -14,6 +14,11 @@ exports.login = async (req, res) => {
         success: false, 
         message: 'Card number and PIN are required' 
       });
+    }   if (!cardNumber || !pin) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Card number and PIN are required' 
+      });
     }
 
     // Find user by card number

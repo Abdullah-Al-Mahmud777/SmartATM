@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { API_ENDPOINTS } from "@/lib/config";
+
+// Hardcoded API URL for testing
+const API_URL = 'http://localhost:5000';
 
 export default function ATMLogin() {
   const router = useRouter();
@@ -29,14 +31,20 @@ export default function ATMLogin() {
     }
 
     try {
-      // Call backend API using config
-      const response = await fetch(API_ENDPOINTS.auth.login, {
+      // Call backend API
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ cardNumber, pin }),
       });
+
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server returned non-JSON response. Please check if backend is running on http://localhost:5000');
+      }
 
       const data = await response.json();
 
