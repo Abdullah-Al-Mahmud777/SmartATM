@@ -1,33 +1,73 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AdminSidebar from '@/components/AdminSidebar';
 
+const API_URL = 'http://localhost:5000';
+
 export default function AdminDashboard() {
-  const [stats] = useState({
-    totalUsers: 1250,
-    activeUsers: 980,
-    totalTransactions: 5420,
-    todayTransactions: 145,
-    blockedCards: 23,
-    frozenAccounts: 8,
-    totalRevenue: '৳12,45,000',
-    pendingIssues: 5
-  });
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const [recentTransactions] = useState([
-    { id: 'TXN001', user: 'John Doe', amount: '৳5,000', type: 'Withdraw', status: 'Completed', time: '10:30 AM' },
-    { id: 'TXN002', user: 'Jane Smith', amount: '৳3,500', type: 'Deposit', status: 'Completed', time: '10:25 AM' },
-    { id: 'TXN003', user: 'Mike Johnson', amount: '৳2,000', type: 'Transfer', status: 'Pending', time: '10:20 AM' },
-    { id: 'TXN004', user: 'Sarah Williams', amount: '৳8,000', type: 'Withdraw', status: 'Completed', time: '10:15 AM' },
-  ]);
+  useEffect(() => {
+    fetchDashboardStats();
+  }, []);
 
-  const [recentUsers] = useState([
-    { id: 'U001', name: 'Alex Brown', account: '1234567890', status: 'Active', joined: '2024-02-10' },
-    { id: 'U002', name: 'Emily Davis', account: '0987654321', status: 'Active', joined: '2024-02-09' },
-    { id: 'U003', name: 'Chris Wilson', account: '5678901234', status: 'Frozen', joined: '2024-02-08' },
-  ]);
+  const fetchDashboardStats = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('adminToken');
+      
+      if (!token) {
+        window.location.href = '/admin/login';
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/api/admin/dashboard/stats`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setStats(data.stats);
+      } else {
+        console.error('Failed to fetch stats:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <AdminSidebar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading dashboard...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <AdminSidebar />
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-gray-600">Failed to load dashboard data</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -46,7 +86,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs md:text-sm opacity-90 mb-1">Total Users</p>
-                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats.totalUsers}</h3>
+                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats?.users?.total || 0}</h3>
                 </div>
                 <div className="text-2xl md:text-3xl lg:text-4xl opacity-80">👥</div>
               </div>
@@ -56,7 +96,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs md:text-sm opacity-90 mb-1">Active Users</p>
-                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats.activeUsers}</h3>
+                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats?.users?.active || 0}</h3>
                 </div>
                 <div className="text-2xl md:text-3xl lg:text-4xl opacity-80">✅</div>
               </div>
@@ -66,7 +106,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs md:text-sm opacity-90 mb-1">Total Transactions</p>
-                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats.totalTransactions}</h3>
+                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats?.transactions?.total || 0}</h3>
                 </div>
                 <div className="text-2xl md:text-3xl lg:text-4xl opacity-80">💳</div>
               </div>
@@ -76,7 +116,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs md:text-sm opacity-90 mb-1">Today's Transactions</p>
-                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats.todayTransactions}</h3>
+                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats?.transactions?.today || 0}</h3>
                 </div>
                 <div className="text-2xl md:text-3xl lg:text-4xl opacity-80">📊</div>
               </div>
@@ -86,7 +126,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs md:text-sm opacity-90 mb-1">Blocked Cards</p>
-                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats.blockedCards}</h3>
+                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats?.cards?.blocked || 0}</h3>
                 </div>
                 <div className="text-2xl md:text-3xl lg:text-4xl opacity-80">🚫</div>
               </div>
@@ -96,7 +136,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs md:text-sm opacity-90 mb-1">Frozen Accounts</p>
-                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats.frozenAccounts}</h3>
+                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats?.users?.frozen || 0}</h3>
                 </div>
                 <div className="text-2xl md:text-3xl lg:text-4xl opacity-80">❄️</div>
               </div>
@@ -106,7 +146,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs md:text-sm opacity-90 mb-1">Total Revenue</p>
-                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats.totalRevenue}</h3>
+                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">৳{(stats?.revenue?.total || 0).toLocaleString()}</h3>
                 </div>
                 <div className="text-2xl md:text-3xl lg:text-4xl opacity-80">💰</div>
               </div>
@@ -116,7 +156,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs md:text-sm opacity-90 mb-1">Pending Issues</p>
-                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats.pendingIssues}</h3>
+                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">{stats?.emergencies?.pending || 0}</h3>
                 </div>
                 <div className="text-2xl md:text-3xl lg:text-4xl opacity-80">⚠️</div>
               </div>
@@ -153,20 +193,24 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
               <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Recent Transactions</h2>
               <div className="space-y-3">
-                {recentTransactions.map((txn) => (
-                  <div key={txn.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex-1 min-w-0 mr-2">
-                      <p className="font-semibold text-gray-800 text-sm md:text-base truncate">{txn.user}</p>
-                      <p className="text-xs md:text-sm text-gray-600 truncate">{txn.id} • {txn.type}</p>
+                {stats?.recentTransactions && stats.recentTransactions.length > 0 ? (
+                  stats.recentTransactions.map((txn) => (
+                    <div key={txn.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex-1 min-w-0 mr-2">
+                        <p className="font-semibold text-gray-800 text-sm md:text-base truncate">{txn.user}</p>
+                        <p className="text-xs md:text-sm text-gray-600 truncate">{txn.id} • {txn.type}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-gray-800 text-sm md:text-base whitespace-nowrap">৳{txn.amount.toLocaleString()}</p>
+                        <p className={`text-xs md:text-sm ${txn.status === 'Completed' ? 'text-green-600' : 'text-yellow-600'}`}>
+                          {txn.status}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-gray-800 text-sm md:text-base whitespace-nowrap">{txn.amount}</p>
-                      <p className={`text-xs md:text-sm ${txn.status === 'Completed' ? 'text-green-600' : 'text-yellow-600'}`}>
-                        {txn.status}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">No recent transactions</p>
+                )}
               </div>
               <Link href="/admin/transactions" className="block mt-4 text-center text-blue-600 hover:text-blue-700 font-semibold text-sm md:text-base">
                 View All Transactions →
@@ -177,20 +221,24 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
               <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Recent Users</h2>
               <div className="space-y-3">
-                {recentUsers.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex-1 min-w-0 mr-2">
-                      <p className="font-semibold text-gray-800 text-sm md:text-base truncate">{user.name}</p>
-                      <p className="text-xs md:text-sm text-gray-600 truncate">{user.account}</p>
+                {stats?.recentUsers && stats.recentUsers.length > 0 ? (
+                  stats.recentUsers.map((user) => (
+                    <div key={user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex-1 min-w-0 mr-2">
+                        <p className="font-semibold text-gray-800 text-sm md:text-base truncate">{user.name}</p>
+                        <p className="text-xs md:text-sm text-gray-600 truncate">{user.account}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-xs md:text-sm font-semibold ${user.status === 'Active' ? 'text-green-600' : 'text-red-600'}`}>
+                          {user.status}
+                        </p>
+                        <p className="text-xs text-gray-500">{new Date(user.joined).toLocaleDateString()}</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className={`text-xs md:text-sm font-semibold ${user.status === 'Active' ? 'text-green-600' : 'text-red-600'}`}>
-                        {user.status}
-                      </p>
-                      <p className="text-xs text-gray-500">{user.joined}</p>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">No recent users</p>
+                )}
               </div>
               <Link href="/admin/users" className="block mt-4 text-center text-blue-600 hover:text-blue-700 font-semibold text-sm md:text-base">
                 View All Users →

@@ -1,26 +1,108 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminSidebar from '@/components/AdminSidebar';
 
+const API_URL = 'http://localhost:5000';
+
 export default function Notifications() {
-  const [notificationType, setNotificationType] = useState('all');
+  const [notificationType, setNotificationType] = useState('System');
   const [notificationTitle, setNotificationTitle] = useState('');
   const [notificationMessage, setNotificationMessage] = useState('');
   const [targetUsers, setTargetUsers] = useState('all');
+  const [priority, setPriority] = useState('Medium');
+  const [sentNotifications, setSentNotifications] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: '' });
+  const [stats, setStats] = useState({
+    totalSent: 0,
+    today: 0,
+    unreadCount: 0
+  });
 
-  const [sentNotifications] = useState([
-    { id: 1, title: 'System Maintenance', message: 'Scheduled maintenance on Feb 20', type: 'System', target: 'All Users', sentAt: '2024-02-15 10:00 AM', status: 'Sent' },
-    { id: 2, title: 'New Feature Alert', message: 'Check out our new currency converter', type: 'Feature', target: 'Active Users', sentAt: '2024-02-14 03:30 PM', status: 'Sent' },
-    { id: 3, title: 'Security Alert', message: 'Update your PIN for better security', type: 'Security', target: 'All Users', sentAt: '2024-02-13 09:15 AM', status: 'Sent' },
-    { id: 4, title: 'Transaction Limit Update', message: 'Daily withdrawal limit increased', type: 'Update', target: 'Premium Users', sentAt: '2024-02-12 11:45 AM', status: 'Sent' },
-  ]);
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
-  const handleSendNotification = (e) => {
+  const showToast = (message, type = 'success') => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast({ show: false, message: '', type: '' }), 3000);
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch(`${API_URL}/api/admin/notifications?limit=50`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setSentNotifications(data.notifications || []);
+        setStats({
+          totalSent: data.notifications?.length || 0,
+          today: data.notifications?.filter(n => {
+            const today = new Date().toDateString();
+            return new Date(n.createdAt).toDateString() === today;
+          }).length || 0,
+          unreadCount: data.unreadCount || 0
+        });
+      }
+    } catch (error) {
+      console.error('Fetch notifications error:', error);
+    }
+  };
+
+  const handleSendNotification = async (e) => {
     e.preventDefault();
-    alert(`Notification sent to ${targetUsers}!\nTitle: ${notificationTitle}\nMessage: ${notificationMessage}`);
-    setNotificationTitle('');
-    setNotificationMessage('');
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch(`${API_URL}/api/admin/notifications`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          type: notificationType,
+          priority,
+          title: notificationTitle,
+          message: notificationMessage,
+          metadata: { targetUsers }
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showToast('Notification sent successfully!', 'success');
+        setNotificationTitle('');
+        setNotificationMessage('');
+        fetchNotifications();
+      } else {
+        showToast(data.message || 'Failed to send notification', 'error');
+      }
+    } catch (error) {
+      console.error('Send notification error:', error);
+      showToast('Failed to send notification', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
@@ -28,9 +110,17 @@ export default function Notifications() {
       <AdminSidebar />
       <div className="flex-1 p-6">
         <div className="max-w-7xl mx-auto">
+          {/* Toast Notification */}
+          {toast.show && (
+            <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg ${
+              toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            } text-white font-semibold animate-slideIn`}>
+              {toast.message}
+            </div>
+          )}
+
           {/* Header */}
           <div className="mb-6">
-            {/* text-gray-800 থেকে text-black করা হয়েছে */}
             <h1 className="text-4xl font-bold text-black mb-2">Notification Center</h1>
             <p className="text-black opacity-80">Send announcements and alerts to users</p>
           </div>
@@ -38,10 +128,10 @@ export default function Notifications() {
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             {[
-              { label: 'Total Sent', value: sentNotifications.length, color: 'text-black' },
-              { label: 'Today', value: '2', color: 'text-blue-600' },
+              { label: 'Total Sent', value: stats.totalSent, color: 'text-black' },
+              { label: 'Today', value: stats.today, color: 'text-blue-600' },
+              { label: 'Unread', value: stats.unreadCount, color: 'text-orange-600' },
               { label: 'Delivery Rate', value: '98.5%', color: 'text-green-600' },
-              { label: 'Open Rate', value: '85.2%', color: 'text-purple-600' },
             ].map((stat, index) => (
               <div key={index} className="bg-white p-4 rounded-lg shadow">
                 <p className="text-black text-sm font-medium">{stat.label}</p>
@@ -54,7 +144,7 @@ export default function Notifications() {
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
             <h2 className="text-2xl font-bold text-black mb-4">Send New Notification</h2>
             <form onSubmit={handleSendNotification} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-black mb-2">
                     Notification Type
@@ -64,12 +154,29 @@ export default function Notifications() {
                     onChange={(e) => setNotificationType(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-black"
                   >
-                    <option value="all">All Types</option>
-                    <option value="system">System</option>
-                    <option value="security">Security</option>
-                    <option value="feature">Feature</option>
-                    <option value="update">Update</option>
-                    <option value="promotion">Promotion</option>
+                    <option value="System">System</option>
+                    <option value="Security">Security</option>
+                    <option value="Transaction">Transaction</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Promotion">Promotion</option>
+                    <option value="ATM">ATM</option>
+                    <option value="Emergency">Emergency</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-black mb-2">
+                    Priority
+                  </label>
+                  <select
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-black"
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
                   </select>
                 </div>
 
@@ -122,15 +229,10 @@ export default function Notifications() {
               <div className="flex gap-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
+                  disabled={loading}
+                  className={`flex-1 ${loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'} text-white font-semibold py-3 rounded-lg transition`}
                 >
-                  Send Notification
-                </button>
-                <button
-                  type="button"
-                  className="px-6 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 rounded-lg transition"
-                >
-                  Schedule
+                  {loading ? 'Sending...' : 'Send Notification'}
                 </button>
               </div>
             </form>
@@ -139,38 +241,48 @@ export default function Notifications() {
           {/* Sent Notifications History */}
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h2 className="text-2xl font-bold text-black mb-4">Notification History</h2>
-            <div className="space-y-3">
-              {sentNotifications.map((notification) => (
-                <div key={notification.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-bold text-black">{notification.title}</h3>
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                          notification.type === 'System' ? 'bg-blue-100 text-blue-800' :
-                          notification.type === 'Security' ? 'bg-red-100 text-red-800' :
-                          notification.type === 'Feature' ? 'bg-green-100 text-green-800' :
-                          'bg-purple-100 text-purple-800'
-                        }`}>
-                          {notification.type}
-                        </span>
-                        <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold">
-                          {notification.status}
-                        </span>
-                      </div>
-                      <p className="text-sm text-black mb-2 font-medium">{notification.message}</p>
-                      <div className="flex items-center gap-4 text-xs text-black font-semibold">
-                        <span>👥 {notification.target}</span>
-                        <span>📅 {notification.sentAt}</span>
+            {sentNotifications.length === 0 ? (
+              <p className="text-center text-gray-500 py-8">No notifications sent yet</p>
+            ) : (
+              <div className="space-y-3">
+                {sentNotifications.map((notification) => (
+                  <div key={notification.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="font-bold text-black">{notification.title}</h3>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                            notification.type === 'System' ? 'bg-blue-100 text-blue-800' :
+                            notification.type === 'Security' ? 'bg-red-100 text-red-800' :
+                            notification.type === 'Transaction' ? 'bg-green-100 text-green-800' :
+                            notification.type === 'Emergency' ? 'bg-red-100 text-red-800' :
+                            notification.type === 'ATM' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-purple-100 text-purple-800'
+                          }`}>
+                            {notification.type}
+                          </span>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                            notification.priority === 'Critical' ? 'bg-red-100 text-red-800' :
+                            notification.priority === 'High' ? 'bg-orange-100 text-orange-800' :
+                            notification.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {notification.priority}
+                          </span>
+                        </div>
+                        <p className="text-sm text-black mb-2 font-medium">{notification.message}</p>
+                        <div className="flex items-center gap-4 text-xs text-black font-semibold">
+                          <span>📅 {formatDate(notification.createdAt)}</span>
+                          <span className={notification.isRead ? 'text-gray-500' : 'text-green-600'}>
+                            {notification.isRead ? '✓ Read' : '● Unread'}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <button className="ml-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-black rounded-lg text-sm font-bold">
-                      View Details
-                    </button>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

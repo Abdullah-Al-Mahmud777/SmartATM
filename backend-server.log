@@ -1,0 +1,107 @@
+[dotenv@17.3.0] injecting env (4) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+🚀 Server running on http://localhost:5000
+📝 Environment: development
+🔗 API Documentation: http://localhost:5000
+✅ MongoDB Atlas Connected Successfully!
+📊 Database: smart_atm_db
+POST /api/admin/login - 2026-02-21T21:51:21.147Z
+GET /api/admin/settings - 2026-02-21T21:51:22.114Z
+PUT /api/admin/settings/Notifications/email_notifications - 2026-02-21T21:51:26.301Z
+PUT /api/admin/settings/Notifications/sms_notifications - 2026-02-21T21:51:26.748Z
+PUT /api/admin/settings/Notifications/push_notifications - 2026-02-21T21:51:27.174Z
+GET /api/admin/settings - 2026-02-21T21:51:27.639Z
+GET /api/admin/settings - 2026-02-21T21:53:11.894Z
+PUT /api/admin/settings/General/maintenance_mode - 2026-02-21T21:53:14.606Z
+PUT /api/admin/settings/Security/require_2fa - 2026-02-21T21:53:17.660Z
+PUT /api/admin/settings/Notifications/email_notifications - 2026-02-21T21:53:20.256Z
+PUT /api/admin/settings/Notifications/email_notifications - 2026-02-21T21:53:21.203Z
+PUT /api/admin/settings/Notifications/sms_notifications - 2026-02-21T21:53:23.593Z
+PUT /api/admin/settings/Notifications/sms_notifications - 2026-02-21T21:53:24.378Z
+PUT /api/admin/settings/ATM/atm_service_fee - 2026-02-21T21:53:27.748Z
+PUT /api/admin/settings/Notifications/sms_notifications - 2026-02-21T21:53:27.841Z
+PUT /api/admin/settings/ATM/low_cash_threshold - 2026-02-21T21:53:27.928Z
+PUT /api/admin/settings/ATM/maintenance_interval_days - 2026-02-21T21:53:27.948Z
+PUT /api/admin/settings/General/maintenance_mode - 2026-02-21T21:53:27.981Z
+PUT /api/admin/settings/General/support_email - 2026-02-21T21:53:27.996Z
+PUT /api/admin/settings/General/support_phone - 2026-02-21T21:53:28.117Z
+PUT /api/admin/settings/General/system_name - 2026-02-21T21:53:28.284Z
+PUT /api/admin/settings/Limits/daily_transfer_limit - 2026-02-21T21:53:28.298Z
+PUT /api/admin/settings/Limits/daily_withdrawal_limit - 2026-02-21T21:53:28.312Z
+PUT /api/admin/settings/Limits/min_transaction_amount - 2026-02-21T21:53:28.327Z
+PUT /api/admin/settings/Notifications/email_notifications - 2026-02-21T21:53:28.352Z
+PUT /api/admin/settings/Notifications/push_notifications - 2026-02-21T21:53:28.437Z
+PUT /api/admin/settings/Security/session_timeout - 2026-02-21T21:53:28.625Z
+PUT /api/admin/settings/Security/max_login_attempts - 2026-02-21T21:53:28.645Z
+PUT /api/admin/settings/Security/password_expiry_days - 2026-02-21T21:53:28.664Z
+PUT /api/admin/settings/Security/require_2fa - 2026-02-21T21:53:28.681Z
+GET /api/admin/notifications - 2026-02-21T21:53:33.566Z
+GET /api/admin/notifications - 2026-02-21T21:53:33.953Z
+POST /api/admin/notifications - 2026-02-21T21:53:41.897Z
+Create notification error: ValidationError: Notification validation failed: type: `system` is not a valid enum value for path `type`.
+    at Document.invalidate (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/document.js:3405:32)
+    at validatePath (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/document.js:3177:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Promise.all (index 1)
+    at async model.$__validate (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/document.js:3118:3)
+    at async model.validate (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/document.js:2687:5)
+    at async model.validateBeforeSavePreSave (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/plugins/validateBeforeSave.js:39:5)
+    at async Kareem.execPre (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/kareem/index.js:70:24)
+    at async model.$__save (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/model.js:371:5)
+    at async model.save (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/model.js:614:5) {
+  errors: {
+    type: ValidatorError: `system` is not a valid enum value for path `type`.
+        at SchemaString.doValidate (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/schemaType.js:1425:13)
+        at validatePath (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/document.js:3169:24)
+        at model.$__validate (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/document.js:3115:21)
+        at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+        at async model.validate (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/document.js:2687:5)
+        at async model.validateBeforeSavePreSave (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/plugins/validateBeforeSave.js:39:5)
+        at async Kareem.execPre (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/kareem/index.js:70:24)
+        at async model.$__save (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/model.js:371:5)
+        at async model.save (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/model.js:614:5)
+        at async exports.createNotification (/home/shuvo/Documents/smartatm/SmartATM/backend/controllers/notificationController.js:168:5) {
+      properties: [Object],
+      kind: 'enum',
+      path: 'type',
+      value: 'system',
+      reason: undefined,
+      [Symbol(mongoose#validatorError)]: true
+    }
+  },
+  _message: 'Notification validation failed'
+}
+POST /api/admin/notifications - 2026-02-21T21:54:03.021Z
+Create notification error: ValidationError: Notification validation failed: type: `security` is not a valid enum value for path `type`.
+    at Document.invalidate (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/document.js:3405:32)
+    at validatePath (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/document.js:3177:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Promise.all (index 1)
+    at async model.$__validate (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/document.js:3118:3)
+    at async model.validate (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/document.js:2687:5)
+    at async model.validateBeforeSavePreSave (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/plugins/validateBeforeSave.js:39:5)
+    at async Kareem.execPre (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/kareem/index.js:70:24)
+    at async model.$__save (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/model.js:371:5)
+    at async model.save (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/model.js:614:5) {
+  errors: {
+    type: ValidatorError: `security` is not a valid enum value for path `type`.
+        at SchemaString.doValidate (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/schemaType.js:1425:13)
+        at validatePath (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/document.js:3169:24)
+        at model.$__validate (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/document.js:3115:21)
+        at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+        at async model.validate (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/document.js:2687:5)
+        at async model.validateBeforeSavePreSave (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/plugins/validateBeforeSave.js:39:5)
+        at async Kareem.execPre (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/kareem/index.js:70:24)
+        at async model.$__save (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/model.js:371:5)
+        at async model.save (/home/shuvo/Documents/smartatm/SmartATM/backend/node_modules/mongoose/lib/model.js:614:5)
+        at async exports.createNotification (/home/shuvo/Documents/smartatm/SmartATM/backend/controllers/notificationController.js:168:5) {
+      properties: [Object],
+      kind: 'enum',
+      path: 'type',
+      value: 'security',
+      reason: undefined,
+      [Symbol(mongoose#validatorError)]: true
+    }
+  },
+  _message: 'Notification validation failed'
+}
+GET /api/admin/notifications - 2026-02-21T21:56:10.655Z

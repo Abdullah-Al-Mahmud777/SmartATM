@@ -15,6 +15,11 @@ const emergencyRoutes = require('./routes/emergency');
 const adminRoutes = require('./routes/admin');
 const adminAnalyticsRoutes = require('./routes/adminAnalytics');
 const atmMonitoringRoutes = require('./routes/atmMonitoring');
+const adminDashboardRoutes = require('./routes/adminDashboard');
+const adminUsersRoutes = require('./routes/adminUsers');
+const adminTransactionsRoutes = require('./routes/adminTransactions');
+const notificationsRoutes = require('./routes/notifications');
+const settingsRoutes = require('./routes/settings');
 
 const app = express();
 
@@ -54,6 +59,11 @@ app.use('/api/emergency', emergencyRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/analytics', adminAnalyticsRoutes);
 app.use('/api/admin/atm-monitoring', atmMonitoringRoutes);
+app.use('/api/admin/dashboard', adminDashboardRoutes);
+app.use('/api/admin/users', adminUsersRoutes);
+app.use('/api/admin/transactions', adminTransactionsRoutes);
+app.use('/api/admin/notifications', notificationsRoutes);
+app.use('/api/admin/settings', settingsRoutes);
 
 // Root Route - API Documentation
 app.get('/', (req, res) => {
