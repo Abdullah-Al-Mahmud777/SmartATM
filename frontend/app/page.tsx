@@ -1,46 +1,22 @@
 "use client";
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const router = useRouter();
 
-  return (
-    <div className="flex min-h-screen flex-col bg-white">
-      {/* Main Content */}
-      <main className="flex flex-1 flex-col items-center justify-center px-4 py-16">
-        <div className="max-w-2xl text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
-            Welcome to SmartATM
-          </h1>
-          <p className="text-xl text-gray-700 mb-12">
-            Your gateway to seamless digital banking and ATM management
-          </p>
-          
-          {/* Login Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
-              onClick={() => router.push('/atm/login')}
-              className="px-8 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              userLogin
-            </button>
-            <button 
-              onClick={() => router.push('/atm/emergency')}
-              className="px-8 py-3 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors"
-            >
-             Emergency Services
-            </button>
-          </div>
-        </div>
-      </main>
+  useEffect(() => {
+    // Redirect to /atm/home
+    router.push('/atm/home');
+  }, [router]);
 
-      {/* Footer */}
-      <footer className="bg-white py-6 mt-auto border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 text-center text-gray-700">
-          <p>&copy; {new Date().getFullYear()} SmartATM Developed by Abdullah-Al-Mahmud</p>
-        </div>
-      </footer>
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-white">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-gray-900 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading SmartATM...</p>
+      </div>
     </div>
-  )
+  );
 }
