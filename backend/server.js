@@ -9,6 +9,8 @@ const currencyRoutes = require('./routes/currency');
 const limitRoutes = require('./routes/limits');
 const analyticsRoutes = require('./routes/analytics');
 const cardRoutes = require('./routes/card');
+const receiptRoutes = require('./routes/receipt');
+const transferRoutes = require('./routes/transfer');
 
 const app = express();
 
@@ -42,6 +44,8 @@ app.use('/api/currency', currencyRoutes);
 app.use('/api/limits', limitRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/card', cardRoutes);
+app.use('/api/receipt', receiptRoutes);
+app.use('/api/transfer', transferRoutes);
 
 // Root Route - API Documentation
 app.get('/', (req, res) => {
@@ -82,6 +86,20 @@ app.get('/', (req, res) => {
         unblock: 'POST /api/card/unblock (Protected)',
         status: 'GET /api/card/status (Protected)',
         report: 'POST /api/card/report (Protected)'
+      },
+      receipt: {
+        recent: 'GET /api/receipt/recent (Protected)',
+        single: 'GET /api/receipt/:transactionId (Protected)',
+        create: 'POST /api/receipt/create (Protected)',
+        all: 'GET /api/receipt/all (Protected)',
+        markPdf: 'PUT /api/receipt/:receiptId/pdf (Protected)'
+      },
+      transfer: {
+        send: 'POST /api/transfer (Protected)',
+        verify: 'POST /api/transfer/verify (Protected)',
+        history: 'GET /api/transfer/history (Protected)',
+        stats: 'GET /api/transfer/stats (Protected)',
+        details: 'GET /api/transfer/:transferId (Protected)'
       }
     }
   });

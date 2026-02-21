@@ -1,10 +1,78 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
 
+const API_URL = 'http://localhost:5000';
+
 export default function Receipt() {
   const router = useRouter();
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchRecentTransactions();
+  }, []);
+
+  const fetchRecentTransactions = async () => {
+    try {
+      const token = localStorage.getItem('atmToken');
+      if (!token) {
+        router.push('/atm/login');
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/api/receipt/recent`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setTransactions(data.transactions);
+      } else {
+        console.error('Failed to fetch transactions:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+      // If receipt endpoint fails, fallback to transaction history
+      try {
+        const token = localStorage.getItem('atmToken');
+        const fallbackResponse = await fetch(`${API_URL}/api/transactions/history?limit=10`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        const fallbackData = await fallbackResponse.json();
+        
+        if (fallbackData.success) {
+          // Transform transaction history to receipt format
+          const formattedTransactions = fallbackData.transactions.map((t: any) => ({
+            id: t.id,
+            type: t.type,
+            amount: Math.abs(t.amount),
+            date: new Date(t.date).toLocaleDateString(),
+            time: new Date(t.date).toLocaleTimeString(),
+            status: t.status,
+            cardNumber: '****'
+          }));
+          setTransactions(formattedTransactions);
+        }
+      } catch (fallbackError) {
+        console.error('Fallback also failed:', fallbackError);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const generatePDF = (transaction: any) => {
     const doc = new jsPDF();
@@ -47,12 +115,6 @@ export default function Receipt() {
     doc.save(`receipt-${transaction.id}.pdf`);
   };
 
-  const recentTransactions = [
-    { id: 'TXN001', type: 'Withdraw', amount: 5000, date: '2026-02-13', time: '10:30 AM', status: 'Success', cardNumber: '1234' },
-    { id: 'TXN002', type: 'Deposit', amount: 10000, date: '2026-02-12', time: '02:15 PM', status: 'Success', cardNumber: '1234' },
-    { id: 'TXN003', type: 'Transfer', amount: 3000, date: '2026-02-11', time: '11:45 AM', status: 'Success', cardNumber: '1234' },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="bg-indigo-600 text-white p-6 shadow-lg">
@@ -68,39 +130,62 @@ export default function Receipt() {
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="bg-white p-6 rounded-xl shadow-lg">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Recent Transactions</h2>
-          <p className="text-gray-600 mb-6">Click on any transaction to download PDF receipt</p>
-
-          <div className="space-y-4">
-            {recentTransactions.map((transaction) => (
-              <div
-                key={transaction.id}
-                className="border border-gray-200 p-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                onClick={() => generatePDF(transaction)}
-              >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-semibold text-gray-800">{transaction.type}</p>
-                    <p className="text-sm text-gray-600">{transaction.date} at {transaction.time}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xl font-bold text-gray-800">৳{transaction.amount.toLocaleString()}</p>
-                    <button className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
-                      Download PDF →
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+        {loading ? (
+          <div className="bg-white p-8 rounded-xl shadow-lg text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading transactions...</p>
           </div>
-        </div>
+        ) : transactions.length === 0 ? (
+          <div className="bg-white p-8 rounded-xl shadow-lg text-center">
+            <p className="text-gray-600">No transactions found</p>
+            <button
+              onClick={() => router.push('/atm/dashboard')}
+              className="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700"
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Recent Transactions</h2>
+              <p className="text-gray-600 mb-6">Click on any transaction to download PDF receipt</p>
 
-        <div className="mt-6 bg-blue-50 p-4 rounded-lg">
-          <p className="text-sm text-blue-800">
-            💡 Tip: Keep your receipts for record keeping and tax purposes
-          </p>
-        </div>
+              <div className="space-y-4">
+                {transactions.map((transaction) => (
+                  <div
+                    key={transaction.id}
+                    className="border border-gray-200 p-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                    onClick={() => generatePDF(transaction)}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-semibold text-gray-800">{transaction.type}</p>
+                        <p className="text-sm text-gray-600">{transaction.date} at {transaction.time}</p>
+                        <p className="text-xs text-gray-500 mt-1">ID: {transaction.id}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xl font-bold text-gray-800">৳{transaction.amount.toLocaleString()}</p>
+                        <span className={`text-xs px-2 py-1 rounded ${transaction.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                          {transaction.status}
+                        </span>
+                        <p className="text-sm text-indigo-600 hover:text-indigo-800 font-medium mt-1">
+                          Download PDF →
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-6 bg-blue-50 p-4 rounded-lg">
+              <p className="text-sm text-blue-800">
+                💡 Tip: Keep your receipts for record keeping and tax purposes
+              </p>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
