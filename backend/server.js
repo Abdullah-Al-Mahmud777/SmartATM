@@ -11,6 +11,7 @@ const analyticsRoutes = require('./routes/analytics');
 const cardRoutes = require('./routes/card');
 const receiptRoutes = require('./routes/receipt');
 const transferRoutes = require('./routes/transfer');
+const emergencyRoutes = require('./routes/emergency');
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/card', cardRoutes);
 app.use('/api/receipt', receiptRoutes);
 app.use('/api/transfer', transferRoutes);
+app.use('/api/emergency', emergencyRoutes);
 
 // Root Route - API Documentation
 app.get('/', (req, res) => {
@@ -100,6 +102,14 @@ app.get('/', (req, res) => {
         history: 'GET /api/transfer/history (Protected)',
         stats: 'GET /api/transfer/stats (Protected)',
         details: 'GET /api/transfer/:transferId (Protected)'
+      },
+      emergency: {
+        cardBlock: 'POST /api/emergency/card-block (Public)',
+        fraudReport: 'POST /api/emergency/fraud-report (Public)',
+        helpline: 'POST /api/emergency/helpline (Public)',
+        status: 'GET /api/emergency/status/:emergencyId (Public)',
+        helplineNumbers: 'GET /api/emergency/helpline-numbers (Public)',
+        myEmergencies: 'GET /api/emergency/my-emergencies (Protected)'
       }
     }
   });
