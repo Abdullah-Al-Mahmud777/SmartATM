@@ -1,0 +1,58 @@
+╔════════════════════════════════════════════════════════════════╗
+║     Admin Transactions - Name & Account Display Fix           ║
+╚════════════════════════════════════════════════════════════════╝
+
+✅ Current Setup (Already Fixed):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Backend (adminTransactionsController.js):
+  user: t.userId?.name || 'Unknown'        ← User NAME
+  account: t.userId?.accountNumber || 'N/A' ← Account NUMBER
+
+Frontend Table Columns:
+  | Transaction ID | User (NAME) | Account (NUMBER) | Type | Amount |
+
+📋 Table Display:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Transaction ID  | User          | Account      | Type     | Amount
+TXN001         | John Doe      | 1234567890   | Withdraw | ৳5,000
+TXN002         | Jane Smith    | 0987654321   | Deposit  | ৳3,500
+
+🔍 Search Features:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Search Box with Autocomplete:
+   - Type "876" → Shows: "John Doe - Account: 876543210"
+   - Type "John" → Shows: "John Doe - Account: 1234567890"
+   - Click suggestion → Searches automatically
+
+2. Account Filter Dropdown:
+   - Shows: "John Doe - 1234567890"
+   - Name first, then account number
+
+3. Active Filter Badge:
+   - Shows: "John Doe - 1234567890" when filtered
+
+🧪 Testing:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. User dashboard থেকে transaction করুন (Withdraw/Deposit)
+2. Admin dashboard → Transactions page
+3. Table-এ দেখুন:
+   - User column-এ NAME দেখাবে
+   - Account column-এ ACCOUNT NUMBER দেখাবে
+4. Search box-এ account number type করুন
+5. Autocomplete suggestion-এ name দেখাবে
+
+⚠️ যদি এখনও সমস্যা হয়:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Browser console (F12) খুলুন
+2. Network tab দেখুন
+3. /api/admin/transactions API call দেখুন
+4. Response-এ check করুন:
+   - transactions[0].user = "John Doe" (name)
+   - transactions[0].account = "1234567890" (number)
+
+যদি response-এ user = account number আসে, তাহলে:
+  → Database-এ userId properly set নেই
+  → User registration করার সময় transaction-এ userId save হয়নি
+
+╚════════════════════════════════════════════════════════════════╝
