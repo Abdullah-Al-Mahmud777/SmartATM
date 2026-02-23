@@ -28,14 +28,23 @@ const app = express();
 connectDB();
 
 // CORS Configuration - Allow all origins for testing
-app.use(cors({
+const corsOptions = {
   origin: ["https://smart-atm-jade.vercel.app", "http://localhost:5173"],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
+};
 
-app.options("/(.*)", cors());
+// ১. এটি সব রিকোয়েস্টের জন্য CORS হ্যান্ডেল করবে
+app.use(cors(corsOptions));
+
+// ২. কোনো পাথ উল্লেখ না করে সরাসরি এইভাবে লিখুন (এটিই সমাধান)
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Body parser middleware
 app.use(express.json());
