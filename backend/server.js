@@ -171,19 +171,18 @@ app.use((err, req, res, next) => {
 // Start Server
 const PORT = process.env.PORT || 10000;
 
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+// এই অংশটি Render-এ আপনার সার্ভারকে চালু করবে
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🔗 API Documentation: http://localhost:${PORT}`);
-  });
-}
+});
 
 // Export for Vercel
 module.exports = app;
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
-  console.error('❌ Unhandled Promise Rejection:', err);
-  process.exit(1);
+    console.error('❌ Unhandled Promise Rejection:', err);
+    // সার্ভার বন্ধ না করে এরর লগ দেখাবে
 });
