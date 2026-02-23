@@ -25,14 +25,16 @@ const app = express();
 
 const cors = require('cors');
 
-// Add this to your backend's middleware section
-app.use(cors({
-  origin: "https://smart-atm-jade.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
-}));
+const corsOptions = {
+  origin: "https://smart-atm-jade.vercel.app", //
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"]
+};
 
-// Standard middleware to parse JSON request bodies
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // এ
+
 app.use(express.json());
 
 // Connect to Database
