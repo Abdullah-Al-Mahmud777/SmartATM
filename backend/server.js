@@ -23,19 +23,6 @@ const settingsRoutes = require('./routes/settings');
 
 const app = express();
 
-const cors = require('cors');
-
-const corsOptions = {
-  origin: "https://smart-atm-jade.vercel.app", //
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"]
-};
-
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // এ
-
-app.use(express.json());
 
 // Connect to Database
 connectDB();
