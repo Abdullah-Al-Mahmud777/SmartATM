@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-// Hardcoded API URL for testing
-const API_URL = 'http://localhost:5000';
+// Use environment variable for backend URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function ATMLogin() {
   const router = useRouter();

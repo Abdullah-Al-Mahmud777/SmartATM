@@ -6,7 +6,7 @@ import Navbar from '@/components/Navbar';
 import CardStat from '@/components/CardStat';
 import { useAuth } from '@/lib/useAuth';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function ATMDashboard() {
   const router = useRouter();
