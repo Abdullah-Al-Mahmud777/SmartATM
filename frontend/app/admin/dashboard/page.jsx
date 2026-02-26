@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AdminSidebar from '@/components/AdminSidebar';
+import { fetchWithAuth, handleTokenExpiry } from '@/lib/adminAuth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -17,24 +18,12 @@ export default function AdminDashboard() {
   const fetchDashboardStats = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('adminToken');
       
-      if (!token) {
-        window.location.href = '/admin/login';
-        return;
-      }
-
-      const response = await fetch(`${API_URL}/api/admin/dashboard/stats`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
+      const data = await fetchWithAuth(`${API_URL}/api/admin/dashboard/stats`);
+      
+      if (data && data.success) {
         setStats(data.stats);
-      } else {
+      } else if (data) {
         console.error('Failed to fetch stats:', data.message);
       }
     } catch (error) {
