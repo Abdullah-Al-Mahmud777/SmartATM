@@ -211,6 +211,9 @@ exports.getUserNotifications = async (req, res) => {
     const { page = 1, limit = 20 } = req.query;
     const userId = req.userId;
 
+    console.log('📋 getUserNotifications called');
+    console.log('User ID:', userId);
+
     const query = {
       $or: [
         { userId: userId },
@@ -228,6 +231,9 @@ exports.getUserNotifications = async (req, res) => {
       ...query,
       isRead: false 
     });
+
+    console.log('Total notifications found:', totalNotifications);
+    console.log('Unread count:', unreadCount);
 
     res.json({
       success: true,
