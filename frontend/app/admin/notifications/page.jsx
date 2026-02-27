@@ -61,7 +61,13 @@ export default function Notifications() {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${API_URL}/api/admin/notifications`, {
+      
+      // Use broadcast endpoint for all users
+      const endpoint = targetUsers === 'all' 
+        ? `${API_URL}/api/admin/notifications/broadcast`
+        : `${API_URL}/api/admin/notifications`;
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,14 +78,14 @@ export default function Notifications() {
           priority,
           title: notificationTitle,
           message: notificationMessage,
-          metadata: { targetUsers }
+          ...(targetUsers !== 'all' && { metadata: { targetUsers } })
         })
       });
 
       const data = await response.json();
 
       if (data.success) {
-        showToast('Notification sent successfully!', 'success');
+        showToast('Notification sent successfully to users!', 'success');
         setNotificationTitle('');
         setNotificationMessage('');
         fetchNotifications();

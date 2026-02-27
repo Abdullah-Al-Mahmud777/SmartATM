@@ -4,9 +4,9 @@ const Transaction = require('../models/Transaction');
 const Emergency = require('../models/Emergency');
 const jwt = require('jsonwebtoken');
 
-// Generate JWT Token
+// Generate JWT Token (Never expires - 10 years)
 const generateToken = (adminId) => {
-  return jwt.sign({ adminId }, process.env.JWT_SECRET, { expiresIn: '24h' });
+  return jwt.sign({ adminId }, process.env.JWT_SECRET, { expiresIn: '3650d' }); // 10 years
 };
 
 // Admin Login
@@ -486,6 +486,58 @@ exports.createAdmin = async (req, res) => {
 
   } catch (error) {
     console.error('Create admin error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error. Please try again.'
+    });
+  }
+};
+
+// Resolve Emergency
+exports.resolveEmergency = async (req, res) => {
+  try {
+    const { emergencyId } = req.params;
+    const { actionTaken } = req.body;
+
+    console.log('Resolving emergency:', emergencyId);
+    console.log('Admin ID:', req.adminId);
+    console.log('Action taken:', actionTaken);
+
+    const emergency = await Emergency.findOne({ emergencyId });
+
+    if (!emergency) {
+      console.log('Emergency not found:', emergencyId);
+      return res.status(404).json({
+        success: false,
+        message: 'Emergency not found'
+      });
+    }
+
+    console.log('Found emergency:', emergency._id);
+
+    emergency.status = 'Resolved';
+    emergency.resolvedAt = new Date();
+    emergency.resolvedBy = req.adminId;
+    if (actionTaken) {
+      emergency.actionTaken = actionTaken;
+    }
+
+    await emergency.save();
+
+    console.log('Emergency resolved successfully');
+
+    res.json({
+      success: true,
+      message: 'Emergency resolved successfully',
+      emergency: {
+        emergencyId: emergency.emergencyId,
+        status: emergency.status,
+        resolvedAt: emergency.resolvedAt
+      }
+    });
+
+  } catch (error) {
+    console.error('Resolve emergency error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error. Please try again.'

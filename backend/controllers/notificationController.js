@@ -205,4 +205,148 @@ exports.getUnreadCount = async (req, res) => {
   }
 };
 
+// Get User Notifications
+exports.getUserNotifications = async (req, res) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+    const userId = req.userId;
+
+    const query = {
+      $or: [
+        { userId: userId },
+        { userId: null } // Broadcast notifications
+      ]
+    };
+
+    const notifications = await Notification.find(query)
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .skip((parseInt(page) - 1) * parseInt(limit));
+
+    const totalNotifications = await Notification.countDocuments(query);
+    const unreadCount = await Notification.countDocuments({ 
+      ...query,
+      isRead: false 
+    });
+
+    res.json({
+      success: true,
+      notifications: notifications.map(n => ({
+        id: n.notificationId,
+        type: n.type,
+        priority: n.priority,
+        title: n.title,
+        message: n.message,
+        isRead: n.isRead,
+        readAt: n.readAt,
+        actionUrl: n.actionUrl,
+        createdAt: n.createdAt
+      })),
+      unreadCount,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(totalNotifications / parseInt(limit)),
+        totalNotifications
+      }
+    });
+
+  } catch (error) {
+    console.error('Get user notifications error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error. Please try again.'
+    });
+  }
+};
+
+// Send Notification to All Users (Admin only)
+exports.sendBroadcastNotification = async (req, res) => {
+  try {
+    const { type, priority, title, message, actionUrl } = req.body;
+    const adminId = req.adminId;
+
+    if (!title || !message) {
+      return res.status(400).json({
+        success: false,
+        message: 'Title and message are required'
+      });
+    }
+
+    const notification = new Notification({
+      notificationId: generateNotificationId(),
+      adminId,
+      userId: null, // null means broadcast to all users
+      type: type || 'System',
+      priority: priority || 'Medium',
+      title,
+      message,
+      actionUrl
+    });
+
+    await notification.save();
+
+    res.json({
+      success: true,
+      message: 'Broadcast notification sent successfully',
+      notification: {
+        id: notification.notificationId,
+        type: notification.type,
+        title: notification.title
+      }
+    });
+
+  } catch (error) {
+    console.error('Send broadcast notification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error. Please try again.'
+    });
+  }
+};
+
+// Send Notification to Specific User (Admin only)
+exports.sendUserNotification = async (req, res) => {
+  try {
+    const { userId, type, priority, title, message, actionUrl } = req.body;
+    const adminId = req.adminId;
+
+    if (!userId || !title || !message) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID, title and message are required'
+      });
+    }
+
+    const notification = new Notification({
+      notificationId: generateNotificationId(),
+      adminId,
+      userId,
+      type: type || 'System',
+      priority: priority || 'Medium',
+      title,
+      message,
+      actionUrl
+    });
+
+    await notification.save();
+
+    res.json({
+      success: true,
+      message: 'Notification sent successfully',
+      notification: {
+        id: notification.notificationId,
+        type: notification.type,
+        title: notification.title
+      }
+    });
+
+  } catch (error) {
+    console.error('Send user notification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error. Please try again.'
+    });
+  }
+};
+
 module.exports = exports;

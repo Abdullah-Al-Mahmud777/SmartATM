@@ -28,7 +28,7 @@ const adminSchema = new mongoose.Schema({
   },
   permissions: {
     type: [String],
-    default: ['view_users', 'view_transactions', 'view_reports']
+    default: ['view_users', 'view_transactions', 'view_reports', 'manage_users', 'view_emergencies', 'manage_emergencies']
   },
   status: {
     type: String,

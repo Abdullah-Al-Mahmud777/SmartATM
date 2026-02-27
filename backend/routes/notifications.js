@@ -12,6 +12,12 @@ router.get('/', notificationController.getAdminNotifications);
 // Get unread count
 router.get('/unread-count', notificationController.getUnreadCount);
 
+// Send broadcast notification to all users
+router.post('/broadcast', notificationController.sendBroadcastNotification);
+
+// Send notification to specific user
+router.post('/send', notificationController.sendUserNotification);
+
 // Mark notification as read
 router.put('/:notificationId/read', notificationController.markAsRead);
 
@@ -21,7 +27,7 @@ router.put('/mark-all-read', notificationController.markAllAsRead);
 // Delete notification
 router.delete('/:notificationId', notificationController.deleteNotification);
 
-// Create notification
+// Create notification (legacy)
 router.post('/', notificationController.createNotification);
 
 module.exports = router;
