@@ -7,11 +7,30 @@ import { fetchWithAuth } from '@/lib/adminAuth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
+// Add animation styles
+const styles = `
+  @keyframes slide-in {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
+`;
+
 export default function Security() {
   const [emergencies, setEmergencies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('All');
   const [filterStatus, setFilterStatus] = useState('All');
+  const [notification, setNotification] = useState({ show: false, message: '', type: '' });
+  const [resolvingId, setResolvingId] = useState(null);
 
   useEffect(() => {
     fetchEmergencies();
@@ -30,6 +49,7 @@ export default function Security() {
       const data = await fetchWithAuth(`${API_URL}/api/admin/emergencies?${params}`);
       
       if (data && data.success) {
+        console.log('Fetched emergencies:', data.emergencies);
         setEmergencies(data.emergencies || []);
       }
     } catch (error) {
@@ -39,18 +59,78 @@ export default function Security() {
     }
   };
 
+  const showNotification = (message, type = 'success') => {
+    setNotification({ show: true, message, type });
+    setTimeout(() => {
+      setNotification({ show: false, message: '', type: '' });
+    }, 5000);
+  };
+
   const handleResolve = async (emergencyId) => {
+    if (!confirm('Are you sure you want to mark this emergency as resolved?')) {
+      return;
+    }
+
+    setResolvingId(emergencyId);
+
     try {
-      const data = await fetchWithAuth(`${API_URL}/api/admin/emergencies/${emergencyId}/resolve`, {
-        method: 'PUT'
+      const token = localStorage.getItem('adminToken');
+      
+      if (!token) {
+        showNotification('Please login again', 'error');
+        setTimeout(() => window.location.href = '/admin/login', 2000);
+        return;
+      }
+
+      console.log('=== Resolving Emergency ===');
+      console.log('Emergency ID:', emergencyId);
+      console.log('API URL:', `${API_URL}/api/admin/emergencies/${emergencyId}/resolve`);
+
+      const response = await fetch(`${API_URL}/api/admin/emergencies/${emergencyId}/resolve`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          actionTaken: 'Resolved by admin'
+        })
       });
 
-      if (data && data.success) {
-        alert('Emergency resolved successfully');
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response:', text);
+        showNotification('Server error. Please try again later.', 'error');
+        setResolvingId(null);
+        return;
+      }
+
+      const data = await response.json();
+
+      console.log('Response status:', response.status);
+      console.log('Response data:', data);
+
+      if (response.ok && data.success) {
+        showNotification('Emergency resolved successfully!', 'success');
         fetchEmergencies();
+      } else {
+        if (response.status === 403) {
+          showNotification('Permission denied. Contact super admin.', 'error');
+        } else if (response.status === 404) {
+          showNotification('Emergency not found or already resolved.', 'error');
+        } else if (response.status === 401) {
+          showNotification('Session expired. Redirecting to login...', 'error');
+          setTimeout(() => window.location.href = '/admin/login', 2000);
+        } else {
+          showNotification(data.message || 'Failed to resolve emergency', 'error');
+        }
       }
     } catch (error) {
       console.error('Error resolving emergency:', error);
+      showNotification('Network error. Please check your connection.', 'error');
+    } finally {
+      setResolvingId(null);
     }
   };
 
@@ -96,11 +176,22 @@ export default function Security() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <AdminSidebar />
-      <div className="flex-1 p-4 md:p-6 w-full overflow-x-hidden">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
+    <>
+      <style>{styles}</style>
+      <div className="flex min-h-screen bg-gray-100">
+        <AdminSidebar />
+        <div className="flex-1 p-4 md:p-6 w-full overflow-x-hidden">
+          <div className="max-w-7xl mx-auto">
+            {/* Notification */}
+            {notification.show && (
+              <div className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg ${
+                notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+              } text-white font-semibold animate-slide-in`}>
+                {notification.message}
+              </div>
+            )}
+
+            {/* Header */}
           <div className="mb-6 mt-16 lg:mt-0">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
@@ -240,9 +331,14 @@ export default function Security() {
                       {emergency.status !== 'Resolved' && (
                         <button
                           onClick={() => handleResolve(emergency.emergencyId)}
-                          className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-semibold whitespace-nowrap"
+                          disabled={resolvingId === emergency.emergencyId}
+                          className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap ${
+                            resolvingId === emergency.emergencyId
+                              ? 'bg-gray-400 cursor-not-allowed'
+                              : 'bg-green-500 hover:bg-green-600'
+                          } text-white`}
                         >
-                          Mark Resolved
+                          {resolvingId === emergency.emergencyId ? 'Resolving...' : 'Mark Resolved'}
                         </button>
                       )}
                     </div>
@@ -258,5 +354,6 @@ export default function Security() {
         </div>
       </div>
     </div>
+    </>
   );
 }

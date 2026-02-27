@@ -59,7 +59,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, cardNumber: user.cardNumber },
       JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '3650d' }
     );
 
     // Return user data (without PIN)
@@ -146,7 +146,7 @@ exports.register = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, cardNumber: user.cardNumber },
       JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '3650d' }
     );
 
     res.status(201).json({

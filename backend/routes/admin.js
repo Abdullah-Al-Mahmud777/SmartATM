@@ -25,6 +25,7 @@ router.get('/transactions', checkPermission('view_transactions'), adminControlle
 
 // Emergency management
 router.get('/emergencies', checkPermission('view_emergencies'), adminController.getAllEmergencies);
+router.put('/emergencies/:emergencyId/resolve', checkPermission('manage_emergencies'), adminController.resolveEmergency);
 
 // Admin management (Super Admin only)
 router.post('/create', isSuperAdmin, adminController.createAdmin);
