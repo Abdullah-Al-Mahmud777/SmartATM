@@ -34,40 +34,60 @@ export default function Navbar({ title = 'ATM System', showLogout = true, showNo
   const fetchUnreadCount = async () => {
     try {
       const token = localStorage.getItem('atmToken');
-      if (!token) return;
+      if (!token) {
+        console.log('❌ No token found for notifications');
+        return;
+      }
 
+      console.log('🔔 Fetching unread count...');
       const response = await fetch(`${API_URL}/api/notifications/unread-count`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Unread count data:', data);
+      
       if (data.success) {
         setUnreadCount(data.unreadCount);
+        console.log('✅ Unread count:', data.unreadCount);
+      } else {
+        console.error('❌ Failed to fetch unread count:', data.message);
       }
     } catch (error) {
-      console.error('Error fetching unread count:', error);
+      console.error('❌ Error fetching unread count:', error);
     }
   };
 
   const fetchNotifications = async () => {
     try {
       const token = localStorage.getItem('atmToken');
-      if (!token) return;
+      if (!token) {
+        console.log('❌ No token found for notifications list');
+        return;
+      }
 
+      console.log('📋 Fetching notifications list...');
       const response = await fetch(`${API_URL}/api/notifications?limit=10`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
+      console.log('Notifications response status:', response.status);
       const data = await response.json();
+      console.log('Notifications data:', data);
+      
       if (data.success) {
         setNotifications(data.notifications || []);
+        console.log('✅ Loaded notifications:', data.notifications?.length || 0);
+      } else {
+        console.error('❌ Failed to fetch notifications:', data.message);
       }
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.error('❌ Error fetching notifications:', error);
     }
   };
 
