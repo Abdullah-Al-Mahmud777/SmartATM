@@ -193,6 +193,12 @@ export default function ATMLogin() {
 
         <div className="mt-6 text-center space-y-3">
           <button
+            onClick={() => router.push("/atm/forgotPin")}
+            className="text-red-500 hover:text-red-600 text-sm font-medium block w-full"
+          >
+            Forgot PIN?
+          </button>
+          <button
             onClick={() => router.push("/atm/register")}
             className="text-blue-600 hover:underline text-sm font-medium block"
           >

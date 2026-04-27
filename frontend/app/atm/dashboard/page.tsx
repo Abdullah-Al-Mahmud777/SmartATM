@@ -80,7 +80,14 @@ export default function ATMDashboard() {
 
       <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Emergency Button */}
-        
+        <div className="mb-6">
+          <button
+            onClick={() => router.push('/atm/emergency')}
+            className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition"
+          >
+            🚨 Emergency Services (Card Block / Fraud Report)
+          </button>
+        </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

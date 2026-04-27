@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface NavbarProps {
   title?: string;
@@ -16,6 +16,18 @@ export default function Navbar({ title = 'ATM System', showLogout = true, showNo
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotificationPanel, setShowNotificationPanel] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Close panel when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+        setShowNotificationPanel(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (showNotifications) {
@@ -137,7 +149,7 @@ export default function Navbar({ title = 'ATM System', showLogout = true, showNo
         
         <div className="flex items-center gap-4">
           {showNotifications && (
-            <div className="relative">
+            <div className="relative" ref={panelRef}>
               <button
                 onClick={() => setShowNotificationPanel(!showNotificationPanel)}
                 className="relative p-2 hover:bg-blue-700 rounded-lg transition"

@@ -7,8 +7,8 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect to /atm/home
-    router.push('/atm/home');
+    // Redirect to /atm/login
+    router.push('/atm/login');
   }, [router]);
 
   return (
