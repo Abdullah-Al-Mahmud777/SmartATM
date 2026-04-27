@@ -1,0 +1,583 @@
+{
+  "info": {
+    "name": "SmartATM API Collection",
+    "description": "Complete API endpoints for SmartATM system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:10000/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "10000",
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "User Login",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardNumber\": \"1234567890123456\",\n  \"pin\": \"1234\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/auth/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "User Register",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardNumber\": \"1234567890123456\",\n  \"pin\": \"1234\",\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"phone\": \"01712345678\",\n  \"accountNumber\": \"1234567890\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/auth/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE"}
+            ],
+            "url": {
+              "raw": "http://localhost:10000/api/auth/profile",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "auth", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Change PIN",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPin\": \"1234\",\n  \"newPin\": \"5678\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/auth/change-pin",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "auth", "change-pin"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Forgot PIN",
+      "item": [
+        {
+          "name": "Step 1: Send OTP",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/auth/forgot-pin",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "auth", "forgot-pin"]
+            }
+          }
+        },
+        {
+          "name": "Step 2: Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/auth/verify-otp",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "auth", "verify-otp"]
+            }
+          }
+        },
+        {
+          "name": "Step 3: Reset PIN",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resetToken\": \"TOKEN_FROM_VERIFY_OTP\",\n  \"newPin\": \"1234\",\n  \"confirmPin\": \"1234\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/auth/reset-pin",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "auth", "reset-pin"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Withdraw",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/transactions/withdraw",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "transactions", "withdraw"]
+            }
+          }
+        },
+        {
+          "name": "Deposit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 5000\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/transactions/deposit",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "transactions", "deposit"]
+            }
+          }
+        },
+        {
+          "name": "Transaction History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE"}
+            ],
+            "url": {
+              "raw": "http://localhost:10000/api/transactions/history",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "transactions", "history"]
+            }
+          }
+        },
+        {
+          "name": "Get Balance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE"}
+            ],
+            "url": {
+              "raw": "http://localhost:10000/api/transactions/balance",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "transactions", "balance"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transfer",
+      "item": [
+        {
+          "name": "Verify Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accountNumber\": \"1234567890\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/transfer/verify",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "transfer", "verify"]
+            }
+          }
+        },
+        {
+          "name": "Send Money",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipientAccountNumber\": \"1234567890\",\n  \"amount\": 1000,\n  \"note\": \"Payment\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/transfer",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "transfer"]
+            }
+          }
+        },
+        {
+          "name": "Transfer History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE"}
+            ],
+            "url": {
+              "raw": "http://localhost:10000/api/transfer/history",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "transfer", "history"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get User Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE"}
+            ],
+            "url": {
+              "raw": "http://localhost:10000/api/notifications",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "notifications"]
+            }
+          }
+        },
+        {
+          "name": "Get Unread Count",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE"}
+            ],
+            "url": {
+              "raw": "http://localhost:10000/api/notifications/unread-count",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "notifications", "unread-count"]
+            }
+          }
+        },
+        {
+          "name": "Mark as Read",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE"}
+            ],
+            "url": {
+              "raw": "http://localhost:10000/api/notifications/NOTIFICATION_ID/read",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "notifications", "NOTIFICATION_ID", "read"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/admin/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "admin", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer ADMIN_TOKEN_HERE"}
+            ],
+            "url": {
+              "raw": "http://localhost:10000/api/admin/users",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "admin", "users"]
+            }
+          }
+        },
+        {
+          "name": "Get All Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer ADMIN_TOKEN_HERE"}
+            ],
+            "url": {
+              "raw": "http://localhost:10000/api/admin/transactions",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "admin", "transactions"]
+            }
+          }
+        },
+        {
+          "name": "Get Emergencies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer ADMIN_TOKEN_HERE"}
+            ],
+            "url": {
+              "raw": "http://localhost:10000/api/admin/emergencies",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "admin", "emergencies"]
+            }
+          }
+        },
+        {
+          "name": "Resolve Emergency",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer ADMIN_TOKEN_HERE"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resolution\": \"Issue resolved\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/admin/emergencies/EMERGENCY_ID/resolve",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "admin", "emergencies", "EMERGENCY_ID", "resolve"]
+            }
+          }
+        },
+        {
+          "name": "Send Broadcast Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer ADMIN_TOKEN_HERE"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"System Maintenance\",\n  \"message\": \"System will be down for maintenance\",\n  \"type\": \"info\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/admin/notifications/broadcast",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "admin", "notifications", "broadcast"]
+            }
+          }
+        },
+        {
+          "name": "Send User Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer ADMIN_TOKEN_HERE"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"USER_ID_HERE\",\n  \"title\": \"Account Alert\",\n  \"message\": \"Your account has been verified\",\n  \"type\": \"success\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/admin/notifications/send",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "admin", "notifications", "send"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Emergency",
+      "item": [
+        {
+          "name": "Block Card",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardNumber\": \"1234567890123456\",\n  \"reason\": \"Lost card\",\n  \"phone\": \"01712345678\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/emergency/card-block",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "emergency", "card-block"]
+            }
+          }
+        },
+        {
+          "name": "Report Fraud",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardNumber\": \"1234567890123456\",\n  \"description\": \"Unauthorized transaction detected\",\n  \"phone\": \"01712345678\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/emergency/fraud-report",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "emergency", "fraud-report"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Card",
+      "item": [
+        {
+          "name": "Block Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Lost card\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:10000/api/card/block",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "card", "block"]
+            }
+          }
+        },
+        {
+          "name": "Get Card Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE"}
+            ],
+            "url": {
+              "raw": "http://localhost:10000/api/card/status",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "10000",
+              "path": ["api", "card", "status"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

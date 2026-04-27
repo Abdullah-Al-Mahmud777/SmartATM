@@ -52,6 +52,15 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 500000
   },
+  // OTP for forgot PIN
+  resetOtp: {
+    type: String,
+    default: null
+  },
+  resetOtpExpiry: {
+    type: Date,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now

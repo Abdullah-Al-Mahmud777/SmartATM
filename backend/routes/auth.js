@@ -6,6 +6,9 @@ const { verifyToken } = require('../middleware/authMiddleware');
 // Public Routes (No authentication required)
 router.post('/login', authController.login);
 router.post('/register', authController.register);
+router.post('/forgot-pin', authController.forgotPin);
+router.post('/verify-otp', authController.verifyOtp);
+router.post('/reset-pin', authController.resetPin);
 
 // Protected Routes (Authentication required)
 router.get('/profile', verifyToken, authController.getProfile);

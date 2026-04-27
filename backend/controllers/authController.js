@@ -1,7 +1,12 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const User = require('../models/User');
+const { sendOtpEmail } = require('../config/emailService');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+
+// Generate 6-digit OTP
+const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 // User Login Controller
 exports.login = async (req, res) => {
@@ -10,11 +15,6 @@ exports.login = async (req, res) => {
 
     // Validation
     if (!cardNumber || !pin) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Card number and PIN are required' 
-      });
-    }   if (!cardNumber || !pin) {
       return res.status(400).json({ 
         success: false, 
         message: 'Card number and PIN are required' 
@@ -305,5 +305,148 @@ exports.changePin = async (req, res) => {
       success: false, 
       message: 'Server error. Please try again.' 
     });
+  }
+};
+
+// Step 1: Send OTP to email
+exports.forgotPin = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Email is required' });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'No account found with this email' });
+    }
+
+    if (user.status !== 'Active') {
+      return res.status(403).json({ success: false, message: `Account is ${user.status}. Please contact support.` });
+    }
+
+    // Generate OTP
+    const otp = generateOtp();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Save OTP to user (hashed)
+    user.resetOtp = await bcrypt.hash(otp, 10);
+    user.resetOtpExpiry = otpExpiry;
+    await user.save();
+
+    // Send email
+    const emailSent = await sendOtpEmail(user.email, otp, user.name);
+
+    if (!emailSent) {
+      return res.status(500).json({ success: false, message: 'Failed to send OTP email. Please try again.' });
+    }
+
+    res.json({
+      success: true,
+      message: `OTP sent to ${user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3')}`,
+      email: user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3')
+    });
+
+  } catch (error) {
+    console.error('Forgot PIN error:', error);
+    res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+  }
+};
+
+// Step 2: Verify OTP
+exports.verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ success: false, message: 'Email and OTP are required' });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+
+    if (!user || !user.resetOtp || !user.resetOtpExpiry) {
+      return res.status(400).json({ success: false, message: 'OTP not found. Please request a new one.' });
+    }
+
+    // Check expiry
+    if (new Date() > user.resetOtpExpiry) {
+      user.resetOtp = null;
+      user.resetOtpExpiry = null;
+      await user.save();
+      return res.status(400).json({ success: false, message: 'OTP has expired. Please request a new one.' });
+    }
+
+    // Verify OTP
+    const isValidOtp = await bcrypt.compare(otp, user.resetOtp);
+    if (!isValidOtp) {
+      return res.status(400).json({ success: false, message: 'Invalid OTP. Please try again.' });
+    }
+
+    // Generate a short-lived reset token
+    const resetToken = jwt.sign(
+      { userId: user._id, purpose: 'pin_reset' },
+      JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+
+    res.json({
+      success: true,
+      message: 'OTP verified successfully',
+      resetToken
+    });
+
+  } catch (error) {
+    console.error('Verify OTP error:', error);
+    res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+  }
+};
+
+// Step 3: Reset PIN with token
+exports.resetPin = async (req, res) => {
+  try {
+    const { resetToken, newPin, confirmPin } = req.body;
+
+    if (!resetToken || !newPin || !confirmPin) {
+      return res.status(400).json({ success: false, message: 'All fields are required' });
+    }
+
+    if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
+      return res.status(400).json({ success: false, message: 'PIN must be exactly 4 digits' });
+    }
+
+    if (newPin !== confirmPin) {
+      return res.status(400).json({ success: false, message: 'PINs do not match' });
+    }
+
+    // Verify reset token
+    let decoded;
+    try {
+      decoded = jwt.verify(resetToken, JWT_SECRET);
+    } catch (err) {
+      return res.status(400).json({ success: false, message: 'Reset session expired. Please start over.' });
+    }
+
+    if (decoded.purpose !== 'pin_reset') {
+      return res.status(400).json({ success: false, message: 'Invalid reset token.' });
+    }
+
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+
+    // Update PIN
+    user.pin = newPin; // pre-save hook will hash it
+    user.resetOtp = null;
+    user.resetOtpExpiry = null;
+    await user.save();
+
+    res.json({ success: true, message: 'PIN reset successfully! You can now login with your new PIN.' });
+
+  } catch (error) {
+    console.error('Reset PIN error:', error);
+    res.status(500).json({ success: false, message: 'Server error. Please try again.' });
   }
 };

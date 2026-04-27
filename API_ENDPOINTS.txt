@@ -1,0 +1,518 @@
+═══════════════════════════════════════════════════════════════
+                    SMARTATM API ENDPOINTS
+═══════════════════════════════════════════════════════════════
+
+BASE URL: http://localhost:10000
+
+═══════════════════════════════════════════════════════════════
+🏥 HEALTH CHECK
+═══════════════════════════════════════════════════════════════
+
+GET /health
+GET /
+
+═══════════════════════════════════════════════════════════════
+🔐 AUTHENTICATION (User)
+═══════════════════════════════════════════════════════════════
+
+1. User Login
+   POST /api/auth/login
+   Body: {
+     "cardNumber": "1234567890123456",
+     "pin": "1234"
+   }
+
+2. User Register
+   POST /api/auth/register
+   Body: {
+     "cardNumber": "1234567890123456",
+     "pin": "1234",
+     "name": "Test User",
+     "email": "test@example.com",
+     "phone": "01712345678",
+     "accountNumber": "1234567890"
+   }
+
+3. Get Profile (Protected)
+   GET /api/auth/profile
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+4. Update Profile (Protected)
+   PUT /api/auth/profile
+   Headers: Authorization: Bearer YOUR_TOKEN
+   Body: {
+     "name": "Updated Name",
+     "email": "new@example.com",
+     "phone": "01712345678"
+   }
+
+5. Change PIN (Protected)
+   POST /api/auth/change-pin
+   Headers: Authorization: Bearer YOUR_TOKEN
+   Body: {
+     "oldPin": "1234",
+     "newPin": "5678"
+   }
+
+═══════════════════════════════════════════════════════════════
+🔑 FORGOT PIN (3 Steps)
+═══════════════════════════════════════════════════════════════
+
+Step 1: Send OTP to Email
+   POST /api/auth/forgot-pin
+   Body: {
+     "email": "test@example.com"
+   }
+   Response: {
+     "success": true,
+     "message": "OTP sent to te***@example.com",
+     "email": "te***@example.com"
+   }
+
+Step 2: Verify OTP
+   POST /api/auth/verify-otp
+   Body: {
+     "email": "test@example.com",
+     "otp": "123456"
+   }
+   Response: {
+     "success": true,
+     "message": "OTP verified successfully",
+     "resetToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+   }
+
+Step 3: Reset PIN
+   POST /api/auth/reset-pin
+   Body: {
+     "resetToken": "TOKEN_FROM_STEP_2",
+     "newPin": "1234",
+     "confirmPin": "1234"
+   }
+   Response: {
+     "success": true,
+     "message": "PIN reset successfully!"
+   }
+
+═══════════════════════════════════════════════════════════════
+💰 TRANSACTIONS (Protected - Need Token)
+═══════════════════════════════════════════════════════════════
+
+1. Withdraw Money
+   POST /api/transactions/withdraw
+   Headers: Authorization: Bearer YOUR_TOKEN
+   Body: {
+     "amount": 1000
+   }
+
+2. Deposit Money
+   POST /api/transactions/deposit
+   Headers: Authorization: Bearer YOUR_TOKEN
+   Body: {
+     "amount": 5000
+   }
+
+3. Get Transaction History
+   GET /api/transactions/history
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+4. Get Balance
+   GET /api/transactions/balance
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+═══════════════════════════════════════════════════════════════
+💸 MONEY TRANSFER (Protected)
+═══════════════════════════════════════════════════════════════
+
+1. Verify Account
+   POST /api/transfer/verify
+   Headers: Authorization: Bearer YOUR_TOKEN
+   Body: {
+     "accountNumber": "1234567890"
+   }
+   Response: {
+     "success": true,
+     "recipient": {
+       "name": "John Doe",
+       "accountNumber": "1234567890"
+     }
+   }
+
+2. Send Money
+   POST /api/transfer
+   Headers: Authorization: Bearer YOUR_TOKEN
+   Body: {
+     "recipientAccountNumber": "1234567890",
+     "amount": 1000,
+     "note": "Payment for services"
+   }
+
+3. Transfer History
+   GET /api/transfer/history
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+4. Transfer Stats
+   GET /api/transfer/stats
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+5. Transfer Details
+   GET /api/transfer/:transferId
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+═══════════════════════════════════════════════════════════════
+🔔 NOTIFICATIONS (Protected)
+═══════════════════════════════════════════════════════════════
+
+1. Get All Notifications
+   GET /api/notifications
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+2. Get Unread Count
+   GET /api/notifications/unread-count
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+3. Mark as Read
+   PUT /api/notifications/:notificationId/read
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+4. Mark All as Read
+   PUT /api/notifications/mark-all-read
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+═══════════════════════════════════════════════════════════════
+💳 CARD MANAGEMENT (Protected)
+═══════════════════════════════════════════════════════════════
+
+1. Block Card
+   POST /api/card/block
+   Headers: Authorization: Bearer YOUR_TOKEN
+   Body: {
+     "reason": "Lost card"
+   }
+
+2. Unblock Card
+   POST /api/card/unblock
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+3. Get Card Status
+   GET /api/card/status
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+4. Report Card Issue
+   POST /api/card/report
+   Headers: Authorization: Bearer YOUR_TOKEN
+   Body: {
+     "issue": "Card not working",
+     "description": "Card is not being accepted at ATM"
+   }
+
+═══════════════════════════════════════════════════════════════
+🚨 EMERGENCY (Public - No Token Required)
+═══════════════════════════════════════════════════════════════
+
+1. Emergency Card Block
+   POST /api/emergency/card-block
+   Body: {
+     "cardNumber": "1234567890123456",
+     "reason": "Card stolen",
+     "phone": "01712345678"
+   }
+
+2. Report Fraud
+   POST /api/emergency/fraud-report
+   Body: {
+     "cardNumber": "1234567890123456",
+     "description": "Unauthorized transaction detected",
+     "phone": "01712345678"
+   }
+
+3. Helpline Request
+   POST /api/emergency/helpline
+   Body: {
+     "name": "John Doe",
+     "phone": "01712345678",
+     "issue": "Cannot withdraw money"
+   }
+
+4. Get Emergency Status
+   GET /api/emergency/status/:emergencyId
+
+5. Get Helpline Numbers
+   GET /api/emergency/helpline-numbers
+
+6. My Emergencies (Protected)
+   GET /api/emergency/my-emergencies
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+═══════════════════════════════════════════════════════════════
+📊 ANALYTICS (Protected)
+═══════════════════════════════════════════════════════════════
+
+1. Get Overview
+   GET /api/analytics
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+2. Get Spending Analysis
+   GET /api/analytics/spending
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+═══════════════════════════════════════════════════════════════
+💱 CURRENCY CONVERTER
+═══════════════════════════════════════════════════════════════
+
+1. Get Exchange Rates
+   GET /api/currency/rates
+
+2. Convert Currency (Protected)
+   POST /api/currency/convert
+   Headers: Authorization: Bearer YOUR_TOKEN
+   Body: {
+     "amount": 1000,
+     "fromCurrency": "BDT",
+     "toCurrency": "USD"
+   }
+
+3. Get All Currencies
+   GET /api/currency/currencies
+
+═══════════════════════════════════════════════════════════════
+⚙️ LIMITS (Protected)
+═══════════════════════════════════════════════════════════════
+
+1. Get Limits
+   GET /api/limits
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+2. Update Limits
+   PUT /api/limits
+   Headers: Authorization: Bearer YOUR_TOKEN
+   Body: {
+     "dailyWithdrawalLimit": 50000,
+     "monthlyWithdrawalLimit": 200000
+   }
+
+═══════════════════════════════════════════════════════════════
+🧾 RECEIPTS (Protected)
+═══════════════════════════════════════════════════════════════
+
+1. Get Recent Receipts
+   GET /api/receipt/recent
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+2. Get Single Receipt
+   GET /api/receipt/:transactionId
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+3. Get All Receipts
+   GET /api/receipt/all
+   Headers: Authorization: Bearer YOUR_TOKEN
+
+4. Create Receipt
+   POST /api/receipt/create
+   Headers: Authorization: Bearer YOUR_TOKEN
+   Body: {
+     "transactionId": "TRANSACTION_ID"
+   }
+
+═══════════════════════════════════════════════════════════════
+👨‍💼 ADMIN AUTHENTICATION
+═══════════════════════════════════════════════════════════════
+
+1. Admin Login
+   POST /api/admin/login
+   Body: {
+     "username": "admin",
+     "password": "admin123"
+   }
+   Response: {
+     "success": true,
+     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+     "admin": {
+       "id": "...",
+       "username": "admin",
+       "role": "super_admin"
+     }
+   }
+
+2. Admin Profile (Protected)
+   GET /api/admin/profile
+   Headers: Authorization: Bearer ADMIN_TOKEN
+
+═══════════════════════════════════════════════════════════════
+👥 ADMIN - USER MANAGEMENT (Protected)
+═══════════════════════════════════════════════════════════════
+
+1. Get All Users
+   GET /api/admin/users
+   Headers: Authorization: Bearer ADMIN_TOKEN
+
+2. Get Single User
+   GET /api/admin/users/:userId
+   Headers: Authorization: Bearer ADMIN_TOKEN
+
+3. Freeze/Unfreeze User
+   PUT /api/admin/users/:userId/freeze
+   Headers: Authorization: Bearer ADMIN_TOKEN
+
+4. Block/Unblock Card
+   PUT /api/admin/users/:userId/block-card
+   Headers: Authorization: Bearer ADMIN_TOKEN
+
+5. Reset User PIN
+   PUT /api/admin/users/:userId/reset-pin
+   Headers: Authorization: Bearer ADMIN_TOKEN
+   Body: {
+     "newPin": "1234"
+   }
+
+6. Update User Status
+   PUT /api/admin/users/:userId/status
+   Headers: Authorization: Bearer ADMIN_TOKEN
+   Body: {
+     "status": "Active"
+   }
+
+═══════════════════════════════════════════════════════════════
+💳 ADMIN - TRANSACTION MANAGEMENT (Protected)
+═══════════════════════════════════════════════════════════════
+
+1. Get All Transactions
+   GET /api/admin/transactions
+   Headers: Authorization: Bearer ADMIN_TOKEN
+   Query Params: ?accountNumber=1234567890&search=deposit
+
+2. Get Transaction Details
+   GET /api/admin/transactions/:transactionId
+   Headers: Authorization: Bearer ADMIN_TOKEN
+
+3. Get Account Numbers (for dropdown)
+   GET /api/admin/transactions/account-numbers
+   Headers: Authorization: Bearer ADMIN_TOKEN
+
+═══════════════════════════════════════════════════════════════
+🚨 ADMIN - EMERGENCY MANAGEMENT (Protected)
+═══════════════════════════════════════════════════════════════
+
+1. Get All Emergencies
+   GET /api/admin/emergencies
+   Headers: Authorization: Bearer ADMIN_TOKEN
+   Query Params: ?type=card_block&status=pending
+
+2. Resolve Emergency
+   PUT /api/admin/emergencies/:emergencyId/resolve
+   Headers: Authorization: Bearer ADMIN_TOKEN
+   Body: {
+     "resolution": "Issue has been resolved"
+   }
+
+═══════════════════════════════════════════════════════════════
+🔔 ADMIN - NOTIFICATIONS (Protected)
+═══════════════════════════════════════════════════════════════
+
+1. Send Broadcast Notification (to all users)
+   POST /api/admin/notifications/broadcast
+   Headers: Authorization: Bearer ADMIN_TOKEN
+   Body: {
+     "title": "System Maintenance",
+     "message": "System will be down for maintenance on Sunday",
+     "type": "info"
+   }
+   Types: info, warning, success, error
+
+2. Send User Notification (to specific user)
+   POST /api/admin/notifications/send
+   Headers: Authorization: Bearer ADMIN_TOKEN
+   Body: {
+     "userId": "USER_ID_HERE",
+     "title": "Account Verified",
+     "message": "Your account has been successfully verified",
+     "type": "success"
+   }
+
+3. Get All Notifications
+   GET /api/admin/notifications
+   Headers: Authorization: Bearer ADMIN_TOKEN
+
+═══════════════════════════════════════════════════════════════
+📊 ADMIN - DASHBOARD & ANALYTICS (Protected)
+═══════════════════════════════════════════════════════════════
+
+1. Dashboard Stats
+   GET /api/admin/dashboard/stats
+   Headers: Authorization: Bearer ADMIN_TOKEN
+
+2. Admin Analytics
+   GET /api/admin/analytics
+   Headers: Authorization: Bearer ADMIN_TOKEN
+
+3. ATM Monitoring
+   GET /api/admin/atm-monitoring
+   Headers: Authorization: Bearer ADMIN_TOKEN
+
+═══════════════════════════════════════════════════════════════
+⚙️ ADMIN - SETTINGS (Protected)
+═══════════════════════════════════════════════════════════════
+
+1. Get System Settings
+   GET /api/admin/settings
+   Headers: Authorization: Bearer ADMIN_TOKEN
+
+2. Update System Settings
+   PUT /api/admin/settings
+   Headers: Authorization: Bearer ADMIN_TOKEN
+   Body: {
+     "maintenanceMode": false,
+     "maxWithdrawalLimit": 50000,
+     "minBalance": 500
+   }
+
+═══════════════════════════════════════════════════════════════
+📝 NOTES
+═══════════════════════════════════════════════════════════════
+
+1. Protected routes require Authorization header:
+   Authorization: Bearer YOUR_TOKEN_HERE
+
+2. Get token from login/register response
+
+3. Token expires in 3650 days (10 years)
+
+4. All POST/PUT requests need Content-Type header:
+   Content-Type: application/json
+
+5. Response format:
+   {
+     "success": true/false,
+     "message": "...",
+     "data": {...}
+   }
+
+═══════════════════════════════════════════════════════════════
+🧪 TESTING WORKFLOW
+═══════════════════════════════════════════════════════════════
+
+1. Test Health Check:
+   GET http://localhost:10000/health
+
+2. Register a User:
+   POST http://localhost:10000/api/auth/register
+
+3. Login:
+   POST http://localhost:10000/api/auth/login
+   (Copy the token from response)
+
+4. Test Protected Routes:
+   Add token to Authorization header
+   GET http://localhost:10000/api/auth/profile
+
+5. Test Forgot PIN:
+   Step 1: POST /api/auth/forgot-pin
+   Step 2: Check email for OTP
+   Step 3: POST /api/auth/verify-otp
+   Step 4: POST /api/auth/reset-pin
+
+6. Admin Login:
+   POST http://localhost:10000/api/admin/login
+   Username: admin
+   Password: admin123
+
+═══════════════════════════════════════════════════════════════
