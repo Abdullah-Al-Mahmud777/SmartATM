@@ -59,6 +59,10 @@ const start = async (): Promise<void> => {
   }
 };
 
-start();
+// Only start a persistent listener when run directly (local dev / `npm start`).
+// On Vercel the app is imported by api/index.ts and invoked as a handler.
+if (require.main === module) {
+  start();
+}
 
 export { createApp };
