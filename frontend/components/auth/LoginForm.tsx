@@ -33,8 +33,6 @@ const loginSchema = z.object({
 
 type LoginValues = z.infer<typeof loginSchema>;
 
-const IS_DEV = process.env.NODE_ENV !== 'production';
-
 export function LoginForm({ role }: { role: RoleKey }) {
   const meta = ROLES[role];
   const Icon = meta.icon;
@@ -225,21 +223,29 @@ export function LoginForm({ role }: { role: RoleKey }) {
               </Button>
             </form>
 
-            {IS_DEV && (
-              <div className="mt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={fillDemo}
-                  className="h-10 w-full rounded-xl border-dashed border-slate-300 text-slate-600 hover:bg-slate-50"
-                >
-                  Use demo account
-                </Button>
-                <p className="mt-2 text-center font-mono text-[11px] text-slate-400">
-                  {meta.demo.email} · {meta.demo.password}
-                </p>
+            <div className="mt-5 rounded-xl border border-dashed border-slate-200 bg-slate-50/70 p-3">
+              <p className="text-center text-xs font-medium text-slate-500">
+                Default {meta.label} credentials
+              </p>
+              <div className="mt-2 space-y-1 font-mono text-xs text-slate-700">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-slate-400">Email</span>
+                  <span>{meta.demo.email}</span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-slate-400">Password</span>
+                  <span>{meta.demo.password}</span>
+                </div>
               </div>
-            )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={fillDemo}
+                className="mt-3 h-10 w-full rounded-xl border-slate-300 text-slate-600 hover:bg-white"
+              >
+                Use demo account
+              </Button>
+            </div>
           </div>
         </div>
 
