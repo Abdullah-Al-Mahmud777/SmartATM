@@ -70,7 +70,45 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+      'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+}
+
+@keyframes auth-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes auth-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@layer utilities {
+  .animate-auth-fade-up {
+    animation: auth-fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .animate-auth-fade-in {
+    animation: auth-fade-in 0.7s ease-out both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-auth-fade-up,
+  .animate-auth-fade-in {
+    animation: none;
   }
 }
 
