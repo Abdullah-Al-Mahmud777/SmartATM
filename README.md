@@ -13,7 +13,7 @@ A complete, production-style ATM network management dashboard for Dhaka, Banglad
 ## Features
 
 - Email/password login with JWT stored in an **httpOnly cookie**; roles: `admin`, `manager`, `operator`
-- Protected routes via Next middleware + role-based sidebar menu and route guards
+- Protected routes via client-side `GET /auth/me` guard + role-based sidebar menu and route guards
 - Dashboard: 4 stat cards, transaction combo chart (bars + line), ATM status map with coloured
   markers, cash availability bars, recent transactions table, quick actions, top-5 ATMs chart, alerts list
 - Pages: Dashboard, ATM Monitoring, Transactions, Reports, Cash Management, Alerts, Users, Settings
@@ -46,7 +46,6 @@ SmartATM/
     ├── components/        # ui/ (shadcn), layout/, dashboard/, shared/, feature dialogs
     ├── hooks/             # useApi (TanStack Query), useDebounce
     ├── lib/               # api client, types, utils, navigation
-    ├── middleware.ts      # auth + role route protection
     ├── .env.example
     └── package.json
 ```
@@ -104,7 +103,8 @@ alerts and maintenance records.
 
 There is a single login page (`/login`). After signing in you are always taken to `/dashboard`,
 which renders the dashboard that matches your role. Role is read from the JWT (httpOnly cookie)
-via `GET /auth/me`; the same role drives the sidebar menu and the route guards in `middleware.ts`.
+via `GET /auth/me`; the same role drives the sidebar menu and the client-side route guards in
+`app/(dashboard)/layout.tsx`.
 
 | | Admin | Manager | Operator |
 | --- | --- | --- | --- |
@@ -123,9 +123,13 @@ via `GET /auth/me`; the same role drives the sidebar menu and the route guards i
 | Menu: Users | ✓ | ✓ (read/limited) | — |
 | Menu: Settings | ✓ | — | — |
 
-**Route guards (`middleware.ts`)**
+**Route guards (client-side, `app/(dashboard)/layout.tsx`)**
 
-- No `atm_token` cookie → redirect to `/login`.
+Because the auth cookie is set on the API domain (Render) while the app runs on another origin
+(Vercel), the browser cannot read it from edge middleware. Protection is therefore enforced
+client-side: the dashboard layout calls `GET /auth/me` and redirects to `/login` on 401.
+
+- `GET /auth/me` returns 401 (no/expired session) → redirect to `/login`.
 - `/reports`, `/users` → `admin`, `manager` only.
 - `/settings` → `admin` only.
 - Wrong role → redirect to `/dashboard`.

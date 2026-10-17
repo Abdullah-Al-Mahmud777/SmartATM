@@ -1,22 +1,47 @@
 'use client';
 
 import * as React from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { useMe, useLogout } from '@/hooks/useApi';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Topbar } from '@/components/layout/Topbar';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+
+const ROUTE_ROLES: Record<string, string[]> = {
+  '/reports': ['admin', 'manager'],
+  '/users': ['admin', 'manager'],
+  '/settings': ['admin'],
+};
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { data, isLoading } = useMe();
+  const router = useRouter();
+  const pathname = usePathname();
+  const { data, isLoading, isError } = useMe();
   const logout = useLogout();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const user = data?.data;
 
-  if (isLoading) {
+  const denied =
+    !!user &&
+    Object.entries(ROUTE_ROLES).some(
+      ([route, roles]) =>
+        (pathname === route || pathname.startsWith(`${route}/`)) &&
+        !roles.includes(user.role)
+    );
+
+  React.useEffect(() => {
+    if (isError) {
+      router.replace('/login');
+      return;
+    }
+    if (denied) router.replace('/dashboard');
+  }, [isError, denied, router]);
+
+  if (isLoading || isError || !user || denied) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">

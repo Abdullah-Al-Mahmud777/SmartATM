@@ -1,9 +1,9 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import type { ApiResponse } from './types';
 
-const RAW_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:10000';
-export const API_BASE_URL = RAW_URL.replace(/\/$/, '');
-export const API_PREFIX = `${API_BASE_URL}/api/v1`;
+export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:10000').replace(/\/+$/, '');
+// Accept both "https://host" and "https://host/api/v1" so deployed and local envs both work.
+export const API_PREFIX = API_BASE_URL.endsWith('/api/v1') ? API_BASE_URL : `${API_BASE_URL}/api/v1`;
 
 export const api = axios.create({
   baseURL: API_PREFIX,

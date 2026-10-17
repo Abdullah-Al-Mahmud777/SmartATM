@@ -69,7 +69,7 @@ const seed = async () => {
   const names = ['users', 'atms', 'transactions', 'alerts', 'maintenances', 'settings'];
   for (const name of names) {
     try {
-      await db.dropCollection(name);
+      await db?.dropCollection(name);
     } catch {
       // collection did not exist — ignore
     }
