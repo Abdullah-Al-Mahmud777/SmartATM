@@ -157,7 +157,7 @@ Step 3: Reset PIN
 5. Transfer Details
    GET /api/transfer/:transferId
    Headers: Authorization: Bearer YOUR_TOKEN
-
+ 
 ═══════════════════════════════════════════════════════════════
 🔔 NOTIFICATIONS (Protected)
 ═══════════════════════════════════════════════════════════════
