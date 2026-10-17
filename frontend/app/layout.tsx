@@ -1,39 +1,19 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import type { Metadata } from 'next';
+import './globals.css';
+import { Providers } from '@/components/providers';
 
 export const metadata: Metadata = {
-  title: "SmartATM - Banking System",
-  description: "Smart ATM Banking System - Secure, Fast & Reliable",
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
-  },
+  title: 'SmartATM Dashboard',
+  description: 'Real-time ATM network monitoring and management dashboard',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        suppressHydrationWarning
-      >
-        {children}
+    <html lang="en">
+      <body className="min-h-screen bg-background antialiased">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

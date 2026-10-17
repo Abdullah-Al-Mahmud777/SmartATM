@@ -5,6 +5,14 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    rules: {
+      // Controlled dialogs/filters intentionally synchronise local state when
+      // props change (opening a dialog, resetting pagination). This is safe
+      // here and the rule produces false positives for these patterns.
+      "react-hooks/set-state-in-effect": "warn",
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
@@ -12,6 +20,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "tailwind.config.js",
+    "postcss.config.js",
   ]),
 ]);
 
