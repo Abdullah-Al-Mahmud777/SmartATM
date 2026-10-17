@@ -5,9 +5,8 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "prestart": "npm run build",
     "start": "node dist/server.js",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc",
     "typecheck": "tsc --noEmit",
     "seed": "tsx src/seed.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
