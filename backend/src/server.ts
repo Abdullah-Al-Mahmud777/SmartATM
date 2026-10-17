@@ -11,26 +11,17 @@ import { apiLimiter } from './middleware/rateLimit';
 
 const stripTrailingSlash = (value: string): string => value.replace(/\/+$/, '');
 
+// Single source of truth for CORS. Never "*" — credentials mode requires an exact origin.
 const allowedOrigins: string[] = Array.from(
   new Set(
-    ['http://localhost:3000', 'https://smart-atm-three.vercel.app', env.clientUrl]
+    ['https://smart-atm-three.vercel.app', 'http://localhost:3000', env.clientUrl]
       .filter(Boolean)
       .map((origin) => stripTrailingSlash(origin))
   )
 );
 
 const corsOptions: CorsOptions = {
-  origin: (origin, callback) => {
-    // Allow no-origin requests (curl, server-to-server, same-origin).
-    if (!origin) return callback(null, true);
-    const clean = stripTrailingSlash(origin);
-    if (allowedOrigins.includes(clean)) return callback(null, true);
-    // Allow any localhost/127.0.0.1 port in development only.
-    if (!isProd && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(clean)) {
-      return callback(null, true);
-    }
-    return callback(null, false);
-  },
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
