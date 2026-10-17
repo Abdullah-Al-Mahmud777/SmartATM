@@ -2,10 +2,10 @@
   "name": "smartatm-backend",
   "version": "1.0.0",
   "description": "SmartATM Dashboard API — Express.js (TypeScript) + Mongoose",
-  "main": "dist/src/server.js",
+  "main": "dist/src/start.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "start": "node dist/src/server.js",
+    "dev": "tsx watch src/start.ts",
+    "start": "node dist/src/start.js",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "seed": "tsx src/seed.ts",

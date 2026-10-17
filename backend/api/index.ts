@@ -1,10 +1,11 @@
-import { createApp } from '../src/server';
+import type { IncomingMessage, ServerResponse } from 'http';
+import app from '../src/app';
 import { connectDB } from '../src/config/db';
 
-let app: ReturnType<typeof createApp> | undefined;
-
-export default async function handler(req: any, res: any) {
+export default async function handler(
+  req: IncomingMessage,
+  res: ServerResponse
+): Promise<void> {
   await connectDB();
-  app = app || createApp();
-  return app(req, res);
+  return app(req as any, res as any);
 }
