@@ -1,6 +1,6 @@
 import express, { Application } from 'express';
 import helmet from 'helmet';
-import cors, { CorsOptions } from 'cors';
+import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { env, isProd } from './config/env';
@@ -9,33 +9,18 @@ import routes from './routes';
 import { errorHandler, notFound } from './middleware/error';
 import { apiLimiter } from './middleware/rateLimit';
 
-const stripTrailingSlash = (value: string): string => value.replace(/\/+$/, '');
-
-// Single source of truth for CORS. Never "*" — credentials mode requires an exact origin.
-const allowedOrigins: string[] = Array.from(
-  new Set(
-    ['https://smart-atm-three.vercel.app', 'http://localhost:3000', env.clientUrl]
-      .filter(Boolean)
-      .map((origin) => stripTrailingSlash(origin))
-  )
-);
-
-const corsOptions: CorsOptions = {
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 204,
-};
-
 const createApp = (): Application => {
   const app = express();
 
-  app.set('trust proxy', 1);
-
-  // CORS must run before helmet, rate limiting, and routes.
+  const corsOptions = {
+    origin: ['https://smart-atm-three.vercel.app', 'http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  };
   app.use(cors(corsOptions));
   app.options('*', cors(corsOptions));
+  app.set('trust proxy', 1);
 
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.use(express.json({ limit: '1mb' }));
