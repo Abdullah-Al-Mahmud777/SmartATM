@@ -1,24 +1,29 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Providers } from '@/components/providers';
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-});
-
 export const metadata: Metadata = {
-  title: 'SmartATM Dashboard',
-  description: 'Real-time ATM network monitoring and management dashboard',
+  title: {
+    default: 'SmartBank · Online Banking',
+    template: '%s · SmartBank',
+  },
+  description:
+    'SmartBank customer portal for balances, transaction history and account statements.',
+  applicationName: 'SmartBank',
+  robots: { index: false, follow: false },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#07182e',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en">
       <body className="min-h-screen bg-background font-sans antialiased">
         <Providers>{children}</Providers>
       </body>

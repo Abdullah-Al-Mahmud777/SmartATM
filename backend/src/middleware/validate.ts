@@ -1,26 +1,21 @@
 import { NextFunction, Request, Response } from 'express';
-import { ZodError, ZodSchema } from 'zod';
-import { ApiError } from '../utils/ApiError';
+import { ZodTypeAny } from 'zod';
 
-type Source = 'body' | 'query' | 'params';
+interface ValidationSchemas {
+  body?: ZodTypeAny;
+  query?: ZodTypeAny;
+  params?: ZodTypeAny;
+}
 
-export const validate =
-  (schema: ZodSchema, source: Source = 'body') =>
-  (req: Request, _res: Response, next: NextFunction): void => {
+export function validate(schemas: ValidationSchemas) {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     try {
-      const parsed = schema.parse(req[source]);
-      // query/params are read-only getters in express 5; assign safely
-      if (source === 'body') req.body = parsed;
-      else Object.assign(req[source], parsed);
+      if (schemas.body) req.body = schemas.body.parse(req.body);
+      if (schemas.query) req.query = schemas.query.parse(req.query) as Request['query'];
+      if (schemas.params) req.params = schemas.params.parse(req.params) as Request['params'];
       next();
-    } catch (err) {
-      if (err instanceof ZodError) {
-        const details = err.errors.map((e) => ({
-          path: e.path.join('.'),
-          message: e.message,
-        }));
-        return next(ApiError.badRequest('Validation failed', details));
-      }
-      next(err);
+    } catch (error) {
+      next(error);
     }
   };
+}

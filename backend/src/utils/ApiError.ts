@@ -1,30 +1,41 @@
 export class ApiError extends Error {
-  statusCode: number;
-  details?: unknown;
+  readonly statusCode: number;
+  readonly code?: string;
+  readonly details?: unknown;
 
-  constructor(statusCode: number, message: string, details?: unknown) {
+  constructor(statusCode: number, message: string, code?: string, details?: unknown) {
     super(message);
+    this.name = 'ApiError';
     this.statusCode = statusCode;
+    this.code = code;
     this.details = details;
-    Object.setPrototypeOf(this, ApiError.prototype);
   }
 
-  static badRequest(message = 'Bad request', details?: unknown) {
-    return new ApiError(400, message, details);
+  static badRequest(message = 'Invalid request', details?: unknown): ApiError {
+    return new ApiError(400, message, 'BAD_REQUEST', details);
   }
-  static unauthorized(message = 'Unauthorized') {
-    return new ApiError(401, message);
+
+  static unauthorized(message = 'Authentication required'): ApiError {
+    return new ApiError(401, message, 'UNAUTHORIZED');
   }
-  static forbidden(message = 'Forbidden') {
-    return new ApiError(403, message);
+
+  static forbidden(message = 'You do not have access to this resource'): ApiError {
+    return new ApiError(403, message, 'FORBIDDEN');
   }
-  static notFound(message = 'Resource not found') {
-    return new ApiError(404, message);
+
+  static notFound(message = 'Resource not found'): ApiError {
+    return new ApiError(404, message, 'NOT_FOUND');
   }
-  static conflict(message = 'Conflict') {
-    return new ApiError(409, message);
+
+  static conflict(message = 'Resource already exists'): ApiError {
+    return new ApiError(409, message, 'CONFLICT');
   }
-  static tooMany(message = 'Too many requests') {
-    return new ApiError(429, message);
+
+  static locked(message: string, details?: unknown): ApiError {
+    return new ApiError(423, message, 'ACCOUNT_LOCKED', details);
+  }
+
+  static tooManyRequests(message = 'Too many requests'): ApiError {
+    return new ApiError(429, message, 'RATE_LIMITED');
   }
 }

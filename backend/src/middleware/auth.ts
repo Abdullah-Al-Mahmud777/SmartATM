@@ -1,43 +1,45 @@
 import { NextFunction, Request, Response } from 'express';
-import { env } from '../config/env';
-import { User, UserRole } from '../models/User';
+import { authCookieNames } from '../config/env';
+import { User } from '../models/user.model';
 import { ApiError } from '../utils/ApiError';
-import { verifyToken } from '../utils/token';
+import { asyncHandler } from '../utils/asyncHandler';
+import { verifyAccessToken } from '../utils/security';
 
-export const protect = async (
-  req: Request,
-  _res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    let token: string | undefined;
-    const header = req.headers.authorization;
-    if (header?.startsWith('Bearer ')) token = header.split(' ')[1];
-    if (!token && req.cookies?.[env.cookieName]) {
-      token = req.cookies[env.cookieName];
+function extractToken(req: Request): string | null {
+  const cookieToken = req.cookies?.[authCookieNames.access];
+  if (typeof cookieToken === 'string' && cookieToken) return cookieToken;
+
+  const header = req.get('authorization');
+  if (header?.startsWith('Bearer ')) return header.slice(7);
+  return null;
+}
+
+export const requireAuth = asyncHandler(
+  async (req: Request, _res: Response, next: NextFunction) => {
+    const token = extractToken(req);
+    if (!token) {
+      throw ApiError.unauthorized('Please sign in to continue.');
     }
 
-    if (!token) throw ApiError.unauthorized('Authentication required');
+    const payload = verifyAccessToken(token);
+    const user = await User.findById(payload.sub).select(
+      'userId email fullName status tokenVersion'
+    );
 
-    const payload = verifyToken(token);
-    const user = await User.findById(payload.id);
-    if (!user) throw ApiError.unauthorized('User no longer exists');
-    if (user.status !== 'active') throw ApiError.forbidden('Account is not active');
+    if (!user || user.status !== 'active') {
+      throw ApiError.unauthorized('This account is not available.');
+    }
+    if (user.tokenVersion !== payload.tv) {
+      throw ApiError.unauthorized('Your session is no longer valid. Please sign in again.');
+    }
 
-    req.user = user;
+    req.user = {
+      id: user._id.toString(),
+      userId: user.userId,
+      email: user.email,
+      fullName: user.fullName,
+      tokenVersion: user.tokenVersion,
+    };
     next();
-  } catch (err) {
-    if (err instanceof ApiError) return next(err);
-    next(ApiError.unauthorized('Invalid or expired session'));
   }
-};
-
-export const authorize =
-  (...roles: UserRole[]) =>
-  (req: Request, _res: Response, next: NextFunction): void => {
-    if (!req.user) return next(ApiError.unauthorized());
-    if (!roles.includes(req.user.role)) {
-      return next(ApiError.forbidden('Insufficient permissions'));
-    }
-    next();
-  };
+);
