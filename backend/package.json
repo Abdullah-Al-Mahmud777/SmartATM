@@ -3,17 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "description": "SmartBank customer online banking API (Express + MongoDB Atlas)",
-  "main": "dist/server.js",
+  "main": "dist/src/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "seed": "tsx src/db/seed.ts",
     "typecheck": "tsc --noEmit",
     "seed:admin": "tsx src/db/seedAdmin.ts"
   },
   "engines": {
-    "node": ">=20.x"
+    "node": "22.x"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

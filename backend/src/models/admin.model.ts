@@ -25,7 +25,6 @@ const adminSchema = new Schema<IAdmin>(
       trim: true,
       lowercase: true,
       maxlength: 255,
-      unique: true,
     },
     passwordHash: { type: String, required: true, select: false },
     level: { type: String, enum: ['SUPER_ADMIN', 'ADMIN'], default: 'ADMIN' },

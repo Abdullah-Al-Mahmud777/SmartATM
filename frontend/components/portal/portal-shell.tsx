@@ -305,10 +305,6 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
         </header>
 
         <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{children}</main>
-
-        <footer className="px-4 pb-6 text-center text-xs text-slate-400 sm:px-6 lg:px-8">
-          SmartBank demo · MongoDB Atlas · Customer-only banking
-        </footer>
       </div>
 
       <SessionTimeout onExpire={expire} />

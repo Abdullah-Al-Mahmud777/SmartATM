@@ -22,7 +22,7 @@ export default function AdminDashboardPage() {
   const router = useRouter();
   const { data: session, isLoading: sessionLoading } = useAdminSession();
   const admin = session?.admin;
-  const { data, isLoading, isError } = useAdminOverview(true);
+  const { data, isLoading, isError } = useAdminOverview(!!admin);
 
   useEffect(() => {
     if (!sessionLoading && !admin) {

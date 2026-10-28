@@ -19,6 +19,18 @@ module.exports = {
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        navy: '#0B1B4D',
+        brand: {
+          blue: '#0A66C2',
+          teal: '#0099B8',
+          green: '#1FB58F',
+        },
+        field: {
+          DEFAULT: '#EEF1F7',
+          border: '#C5D0E6',
+        },
+        page: '#F4F8FE',
+        blob: '#D8F3FA',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
@@ -59,6 +71,9 @@ module.exports = {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      boxShadow: {
+        card: '0 24px 60px -24px rgba(11, 27, 77, 0.24)',
       },
       keyframes: {
         'accordion-down': {

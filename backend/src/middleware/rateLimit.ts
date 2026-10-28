@@ -3,6 +3,7 @@ import rateLimit from 'express-rate-limit';
 const shared = {
   standardHeaders: 'draft-7' as const,
   legacyHeaders: false,
+  skip: (req: { method?: string }) => req.method === 'OPTIONS',
   message: {
     success: false,
     message: 'Too many requests. Please wait a few minutes and try again.',
@@ -75,10 +76,21 @@ export const pinLimiter = rateLimit({
 export const adminLoginLimiter = rateLimit({
   ...shared,
   windowMs: 15 * 60 * 1000,
-  limit: 10,
+  limit: 20,
   message: {
     success: false,
     message: 'Too many admin sign-in attempts. Please wait 15 minutes and try again.',
+    code: 'RATE_LIMITED',
+  },
+});
+
+export const adminLimiter = rateLimit({
+  ...shared,
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  message: {
+    success: false,
+    message: 'Too many admin requests. Please wait a few minutes and try again.',
     code: 'RATE_LIMITED',
   },
 });

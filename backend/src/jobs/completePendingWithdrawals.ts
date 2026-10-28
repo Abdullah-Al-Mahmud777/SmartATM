@@ -4,6 +4,31 @@ import { Transaction } from '../models/transaction.model';
 
 let task: ScheduledTask | null = null;
 
+const SWEEP_THROTTLE_MS = 30_000;
+let lastSweepAttemptAt = 0;
+
+export async function sweepExpiredPendingWithdrawals(
+  req: unknown,
+  _res: unknown,
+  next: () => void
+): Promise<void> {
+  const now = Date.now();
+  if (now - lastSweepAttemptAt < SWEEP_THROTTLE_MS) {
+    next();
+    return;
+  }
+  lastSweepAttemptAt = now;
+  try {
+    await completeExpiredPendingWithdrawals();
+  } catch (error) {
+    console.error(
+      '[jobs] on-demand sweep failed',
+      error instanceof Error ? error.message : error
+    );
+  }
+  next();
+}
+
 export async function completeExpiredPendingWithdrawals(): Promise<number> {
   const now = new Date();
   const result = await Transaction.updateMany(

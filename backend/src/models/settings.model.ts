@@ -14,7 +14,7 @@ export interface ISettings {
 
 const settingsSchema = new Schema<ISettings>(
   {
-    key: { type: String, required: true, unique: true },
+    key: { type: String, required: true },
     transactionFeePaisa: { type: Number, required: true, min: 0, default: 0 },
     withdrawCancelWindowSeconds: { type: Number, required: true, min: 10, max: 3600, default: 120 },
     defaultDailyLimitPaisa: { type: Number, required: true, min: 0, default: 5_000_000 },

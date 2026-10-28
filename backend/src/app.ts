@@ -15,6 +15,7 @@ import adminRoutes from './modules/admin/admin.routes';
 import authRoutes from './modules/auth/auth.routes';
 import bankingRoutes from './modules/banking/banking.routes';
 import dashboardRoutes from './modules/dashboard/dashboard.routes';
+import jobsRoutes from './modules/jobs/jobs.routes';
 import notificationRoutes from './modules/notifications/notification.routes';
 import transactionRoutes from './modules/transactions/transaction.routes';
 
@@ -23,6 +24,19 @@ const allowedOrigins = new Set([
   'http://localhost:3000',
   'http://127.0.0.1:3000',
 ]);
+
+function isAllowedOrigin(origin: string | undefined): boolean {
+  if (!origin) return true;
+  const normalized = origin.replace(/\/+$/, '');
+  if (allowedOrigins.has(normalized)) return true;
+  try {
+    const url = new URL(normalized);
+    if (url.hostname.endsWith('.vercel.app')) return true;
+  } catch {
+    // ignore
+  }
+  return false;
+}
 
 export function createApp(): Express {
   const app = express();
@@ -42,7 +56,7 @@ export function createApp(): Express {
   app.use(
     cors({
       origin(origin, callback) {
-        if (!origin || allowedOrigins.has(origin.replace(/\/+$/, ''))) {
+        if (isAllowedOrigin(origin)) {
           callback(null, true);
           return;
         }
@@ -82,6 +96,7 @@ export function createApp(): Express {
   app.use('/api/v1/accounts', accountRoutes);
   app.use('/api/v1/transactions', transactionRoutes);
   app.use('/api/v1/notifications', notificationRoutes);
+  app.use('/api/v1/jobs', jobsRoutes);
   app.use('/api/v1', bankingRoutes);
 
   app.use(notFoundHandler);

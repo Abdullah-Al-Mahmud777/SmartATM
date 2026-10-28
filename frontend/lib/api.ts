@@ -5,11 +5,12 @@ import axios, {
 } from 'axios';
 import type { ApiResponse } from './types';
 
-const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+const configuredApiUrl =
+  process.env.NEXT_PUBLIC_API_URL?.trim() || 'https://smartatm-api.vercel.app/api/v1';
 
 if (!configuredApiUrl) {
   throw new Error(
-    'NEXT_PUBLIC_API_URL is not configured. Set it in frontend/.env.local, for example http://localhost:4000/api/v1.'
+    'NEXT_PUBLIC_API_URL is not configured. Set it in frontend/.env.local, for example https://smartatm-api.vercel.app/api/v1.'
   );
 }
 
@@ -92,6 +93,16 @@ api.interceptors.response.use(
       url.includes('/auth/recovery') ||
       url.includes('/auth/register') ||
       isAdminAuthMutation;
+
+    if (status === 429) {
+      const message =
+        (error.response?.data as { message?: string } | undefined)?.message ||
+        'Too many requests. Please wait a moment and try again.';
+      if (typeof window !== 'undefined') {
+        // Avoid noisy toasts from frequent polling; just surface via error
+      }
+      return Promise.reject(new Error(message));
+    }
 
     if (status === 401 && original && !original._retry && !isAuthMutation) {
       original._retry = true;

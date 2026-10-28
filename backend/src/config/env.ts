@@ -15,7 +15,10 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(4000),
   MONGODB_URI: z
     .string()
-    .min(1, 'MONGODB_URI is required. Add your MongoDB Atlas connection string to backend/.env.'),
+    .min(
+      1,
+      'MONGODB_URI is missing. Add your MongoDB Atlas connection string to backend/.env, or set it in the Vercel project environment variables.'
+    ),
   MONGODB_DB_NAME: z
     .string()
     .min(1, 'MONGODB_DB_NAME is required. Use bank_dev for development or bank_test for tests.'),
@@ -43,6 +46,7 @@ const envSchema = z.object({
   EXCHANGE_RATES: z.coerce.string().default('{"USD":0.0085}'),
   SUPER_ADMIN_EMAIL: z.string().email().default('admin@smartbank.com'),
   SUPER_ADMIN_PASSWORD: z.string().min(8).default('Admin@12345'),
+  CRON_SECRET: z.string().min(16).optional(),
 }).superRefine((value, ctx) => {
   if (value.DEPOSIT_MAX_PAISA < value.DEPOSIT_MIN_PAISA) {
     ctx.addIssue({
@@ -138,6 +142,7 @@ export const env = {
   exchangeRates: JSON.parse(raw.EXCHANGE_RATES) as Record<string, number>,
   superAdminEmail: raw.SUPER_ADMIN_EMAIL,
   superAdminPassword: raw.SUPER_ADMIN_PASSWORD,
+  cronSecret: raw.CRON_SECRET,
 } as const;
 
 export const authCookieNames = {

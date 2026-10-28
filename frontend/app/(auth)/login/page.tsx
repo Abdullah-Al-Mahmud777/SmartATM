@@ -1,19 +1,24 @@
 import type { Metadata } from 'next';
-import { LoginForm } from '@/components/auth/login-form';
+import { Inter } from 'next/font/google';
+import { LoginCard } from '@/components/smartatm/login-card';
+import { LoginShell } from '@/components/smartatm/login-shell';
 
-export const metadata: Metadata = { title: 'Sign in' };
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+});
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ next?: string; registered?: string; userId?: string }>;
-}) {
-  const params = await searchParams;
+export const metadata: Metadata = {
+  title: { absolute: 'Sign in · SmartATM' },
+  description: 'Sign in to your SmartATM online banking account.',
+};
+
+export default function LoginPage() {
   return (
-    <LoginForm
-      nextPath={params.next}
-      registered={params.registered === '1'}
-      userId={params.userId}
-    />
+    <div className={inter.className}>
+      <LoginShell>
+        <LoginCard />
+      </LoginShell>
+    </div>
   );
 }

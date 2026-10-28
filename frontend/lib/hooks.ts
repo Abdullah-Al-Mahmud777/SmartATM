@@ -53,6 +53,7 @@ export function useAdminSession() {
     queryKey: ['adminSession'],
     queryFn: () => apiGet<AdminMeResponse>('/admin/me').then((response) => response.data),
     retry: false,
+    refetchOnWindowFocus: false,
     staleTime: 30_000,
   });
 }
@@ -113,6 +114,7 @@ export function useAdminOverview(enabled = true) {
     queryFn: () => apiGet<AdminOverview>('/admin/overview').then((response) => response.data),
     enabled,
     retry: false,
+    refetchOnWindowFocus: false,
     staleTime: 30_000,
   });
 }
